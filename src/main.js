@@ -6,6 +6,8 @@ if (require('electron-squirrel-startup')) {
   app.quit();
 }
 
+import k8s from './k8s';
+
 const isDev = process.env.NODE_ENV === 'development';
 
 /** @type {BrowserWindow} */
@@ -40,6 +42,8 @@ const createWindow = () => {
 
 app.whenReady().then(async () => {
   createWindow();
+
+  console.log(k8s.config.currentContext);
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common

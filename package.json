@@ -35,6 +35,9 @@
     "sass": "^1.66.1"
   },
   "dependencies": {
-    "electron-squirrel-startup": "^1.0.0"
+    "@kubernetes/client-node": "^0.18.1",
+    "bufferutil": "^4.0.7",
+    "electron-squirrel-startup": "^1.0.0",
+    "utf-8-validate": "^6.0.3"
   }
 }
