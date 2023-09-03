@@ -34,16 +34,22 @@ const createWindow = () => {
 
   mainWindow.maximize();
   mainWindow.show();
-
-  if (isDev) {
-    mainWindow.webContents.openDevTools();
-  }
 };
 
 app.whenReady().then(async () => {
+  const err = await k8s.reloadConfig();
+
   createWindow();
 
-  console.log(k8s.config.currentContext);
+  mainWindow.webContents.once('dom-ready', () => {
+    if (isDev) {
+      mainWindow.webContents.openDevTools();
+    }
+
+    if (err) {
+      mainWindow.webContents.send('err', err);
+    }
+  });
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common

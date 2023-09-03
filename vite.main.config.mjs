@@ -8,4 +8,9 @@ export default defineConfig({
     conditions: ['node'],
     mainFields: ['module', 'jsnext:main', 'jsnext'],
   },
+  build: {
+    commonjsOptions: {
+      dynamicRequireTargets: ['./node_modules/shelljs/src/*'],
+    },
+  },
 });
