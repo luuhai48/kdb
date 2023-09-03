@@ -11,7 +11,7 @@ contextBridge.exposeInMainWorld('api', {
    */
   on: (channel, listener) => {
     if (!whitelistListenChannels.includes(channel))
-      return new Error(`Listening on channel "${channel}" is not allowed.`);
+      throw new Error(`Listening on channel "${channel}" is not allowed.`);
 
     ipcRenderer.on(channel, listener);
   },
@@ -23,7 +23,7 @@ contextBridge.exposeInMainWorld('api', {
    */
   send: (channel, ...args) => {
     if (!whitelistSendChannels.includes(channel))
-      return new Error(`Sending event to channel "${channel}" is not allowed.`);
+      throw new Error(`Sending event to channel "${channel}" is not allowed.`);
 
     ipcRenderer.send(channel, ...args);
   },

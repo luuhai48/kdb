@@ -39,6 +39,19 @@ export default {
     }
   },
 
+  /**
+   * Switch context
+   * @param {string} contextName
+   */
+  async setCurrentContext(contextName) {
+    const result = await exec(`kubectl config use-context ${contextName}`);
+    if (!result || result.code !== 0) {
+      return new Error(result.stderr);
+    }
+
+    return this.reloadConfig();
+  },
+
   get config() {
     return config;
   },

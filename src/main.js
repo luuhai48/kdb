@@ -31,9 +31,6 @@ const createWindow = () => {
       path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`),
     );
   }
-
-  mainWindow.maximize();
-  mainWindow.show();
 };
 
 app.whenReady().then(async () => {
@@ -41,7 +38,10 @@ app.whenReady().then(async () => {
 
   createWindow();
 
-  mainWindow.webContents.once('dom-ready', () => {
+  mainWindow.webContents.once('did-finish-load', () => {
+    mainWindow.maximize();
+    mainWindow.show();
+
     if (isDev) {
       mainWindow.webContents.openDevTools();
     }

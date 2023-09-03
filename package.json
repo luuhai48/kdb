@@ -31,13 +31,13 @@
     "electron": "26.1.0",
     "eslint": "^8.48.0",
     "eslint-config-prettier": "^5.0.0",
-    "prettier": "^3.0.3",
-    "sass": "^1.66.1"
+    "prettier": "^3.0.3"
   },
   "dependencies": {
     "@kubernetes/client-node": "^0.18.1",
     "bufferutil": "^4.0.7",
     "electron-squirrel-startup": "^1.0.0",
+    "mithril": "^2.2.2",
     "shelljs": "^0.8.5",
     "utf-8-validate": "^6.0.3"
   }
