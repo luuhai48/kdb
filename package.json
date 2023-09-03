@@ -29,10 +29,13 @@
     "@electron-forge/maker-zip": "^6.4.1",
     "@electron-forge/plugin-auto-unpack-natives": "^6.4.1",
     "@electron-forge/plugin-vite": "^6.4.1",
+    "autoprefixer": "^10.4.15",
     "electron": "26.1.0",
     "eslint": "^8.48.0",
     "eslint-config-prettier": "^5.0.0",
-    "prettier": "^3.0.3"
+    "postcss-loader": "^7.3.3",
+    "prettier": "^3.0.3",
+    "tailwindcss": "^3.3.3"
   },
   "dependencies": {
     "@kubernetes/client-node": "^0.18.1",
