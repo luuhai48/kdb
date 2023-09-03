@@ -2,7 +2,7 @@
   "name": "kdb",
   "productName": "KDB",
   "version": "0.0.1",
-  "description": "Useful k8s dashboard",
+  "description": "Useful kubernetes dashboard",
   "main": ".vite/build/main.js",
   "scripts": {
     "dev": "electron-forge start",
@@ -13,6 +13,7 @@
   },
   "keywords": [
     "Dashboard",
+    "kubernetes",
     "k8s"
   ],
   "author": {
