@@ -1,7 +1,7 @@
 import { contextBridge, ipcRenderer } from 'electron';
 
 const whitelistListenChannels = ['err'];
-const whitelistSendChannels = [];
+const whitelistSendChannels = ['k8s.reloadConfig'];
 
 contextBridge.exposeInMainWorld('api', {
   /**

@@ -8,6 +8,9 @@ let config;
 let api;
 
 export default {
+  /**
+   * @returns {Promise<void|Error>}
+   */
   async reloadConfig() {
     config = new KubeConfig();
 

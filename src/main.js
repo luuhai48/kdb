@@ -7,6 +7,7 @@ if (require('electron-squirrel-startup')) {
 }
 
 import k8s from './k8s';
+import ipcHandlers from './ipcHandlers';
 
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -71,3 +72,6 @@ app.on('activate', () => {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
+ipcHandlers({
+  window: () => mainWindow,
+});
