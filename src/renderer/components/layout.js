@@ -73,7 +73,7 @@ export default function () {
           ),
         ),
 
-        m('section', v.children),
+        v.children,
 
         AppState().modal && m(Modal),
       ]),

@@ -6,6 +6,7 @@ if (require('electron-squirrel-startup')) {
   app.quit();
 }
 
+import './menu';
 import k8s from './k8s';
 import ipcHandlers from './ipcHandlers';
 
