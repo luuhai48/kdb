@@ -17,7 +17,7 @@ contextBridge.exposeInMainWorld('api', {
   },
 
   /**
-   * Send an event to channel
+   * Send an event to backend
    * @param {string} channel
    * @param  {any[]} args
    */

@@ -1,3 +1,5 @@
+/// <reference path="types.d.ts"/>
+
 import m from 'mithril';
 
 import Layout from './components/layout';
