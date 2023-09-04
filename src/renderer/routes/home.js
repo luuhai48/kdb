@@ -3,7 +3,7 @@ import m from 'mithril';
 export default function (contexts) {
   return m({
     view: function () {
-      return m('div', { class: 'mt-4' }, [
+      return m('div', { class: 'max-w-screen-xl mx-auto p-4' }, [
         m(
           'select',
           {
