@@ -36,3 +36,44 @@ window.api.on('err', (_, err) => {
     },
   });
 });
+
+/** @type {[key: string]: any} */
+const awaits = {};
+
+window.api.on('event', (_, args) => {
+  const { channel, id, err, data } = args;
+
+  if (!awaits[channel] || !awaits[channel][id]) return;
+
+  const { resolve, reject } = awaits[channel][id];
+  delete awaits[channel][id];
+
+  if (err) {
+    return reject(err);
+  }
+  return resolve(data);
+});
+
+window.api.sendAsync = async (channel, data) => {
+  if (!awaits[channel]) {
+    awaits[channel] = {};
+  }
+
+  const id = window.crypto.randomUUID();
+  window.api.send(channel, { ...data, id });
+
+  const result = await Promise.race([
+    new Promise((resolve, reject) => {
+      awaits[channel][id] = { resolve, reject };
+    }),
+
+    new Promise((_, reject) =>
+      setTimeout(() => {
+        delete awaits[channel][id];
+        return reject(new Error(`Timeout waiting for event on "${channel}"`));
+      }, 5_000),
+    ),
+  ]);
+
+  return result;
+};

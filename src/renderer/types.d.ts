@@ -18,6 +18,8 @@ declare global {
        * Send an event to backend
        */
       send: (channel: string, ...args: any[]) => void;
+
+      sendAsync: (channel: string, data: Record<string, any>) => Promise<any>;
     };
   }
 }
