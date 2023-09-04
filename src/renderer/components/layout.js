@@ -1,7 +1,7 @@
 import m from 'mithril';
 
 import Modal from './modal';
-import AppState from '../streams/appstate';
+import ModalStream from '../streams/modal';
 
 export default function () {
   return {
@@ -12,7 +12,7 @@ export default function () {
       m('main', { class: '' }, [
         m(
           'nav',
-          { class: 'bg-white border-gray-200 dark:bg-gray-900' },
+          { class: 'bg-white border-b border-gray-200' },
           m(
             'div',
             {
@@ -30,8 +30,7 @@ export default function () {
               m(
                 'span',
                 {
-                  class:
-                    'self-center text-2xl font-semibold whitespace-nowrap dark:text-white',
+                  class: 'self-center text-2xl font-semibold whitespace-nowrap',
                 },
                 'KDB',
               ),
@@ -75,7 +74,15 @@ export default function () {
 
         v.children,
 
-        AppState().modal && m(Modal),
+        ModalStream().modal &&
+          m(Modal, {
+            text: ModalStream().modal.text,
+            buttons: ModalStream().modal.buttons,
+            closeable: ModalStream().modal.closeable,
+            onclick: () => {
+              ModalStream().modal = false;
+            },
+          }),
       ]),
   };
 }
