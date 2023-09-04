@@ -5,7 +5,7 @@ import m from 'mithril';
 import Layout from './components/layout';
 import Home from './routes/home';
 
-import AppState from './components/appstate';
+import AppState from './streams/appstate';
 
 const contexts = [];
 
@@ -19,6 +19,7 @@ m.route(document.body, '/', {
 
 window.api.on('err', (_, err) => {
   AppState({
+    ...AppState(),
     modal: {
       type: 'error',
       text: err.message || 'Something went wrong',

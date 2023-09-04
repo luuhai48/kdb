@@ -1,6 +1,6 @@
 import m from 'mithril';
 
-import AppState from './appstate';
+import AppState from '../streams/appstate';
 
 export default () => ({
   view: () =>

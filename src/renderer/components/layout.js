@@ -1,7 +1,7 @@
 import m from 'mithril';
 
 import Modal from './modal';
-import AppState from './appstate';
+import AppState from '../streams/appstate';
 
 export default function () {
   return {
