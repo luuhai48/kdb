@@ -7,7 +7,6 @@ if (require('electron-squirrel-startup')) {
 }
 
 import './menu';
-import k8s from './k8s';
 import ipcHandlers from './ipcHandlers';
 
 const isDev = process.env.NODE_ENV === 'development';
@@ -38,8 +37,6 @@ const createWindow = () => {
 };
 
 app.whenReady().then(async () => {
-  const err = await k8s.reloadConfig();
-
   createWindow();
 
   mainWindow.webContents.once('did-finish-load', () => {
@@ -48,10 +45,6 @@ app.whenReady().then(async () => {
 
     if (isDev) {
       mainWindow.webContents.openDevTools();
-    }
-
-    if (err) {
-      mainWindow.webContents.send('err', err);
     }
   });
 });

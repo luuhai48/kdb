@@ -7,12 +7,7 @@ import Button from './components/button';
 import Home from './routes/home';
 
 import ModalStream from './streams/modal';
-
-m.route(document.body, '/', {
-  '/': {
-    render: () => m(Layout, m(Home)),
-  },
-});
+import ClusterStream from './streams/cluster';
 
 // =============================================================================
 
@@ -54,7 +49,11 @@ window.api.on('event', (_, args) => {
   return resolve(data);
 });
 
-window.api.sendAsync = async (channel, data) => {
+window.sendAsync = async (
+  channel,
+  data = {},
+  { timeoutMs } = { timeoutMs: 5_000 },
+) => {
   if (!awaits[channel]) {
     awaits[channel] = {};
   }
@@ -71,9 +70,49 @@ window.api.sendAsync = async (channel, data) => {
       setTimeout(() => {
         delete awaits[channel][id];
         return reject(new Error(`Timeout waiting for event on "${channel}"`));
-      }, 5_000),
+      }, timeoutMs),
     ),
   ]);
 
   return result;
 };
+
+// =============================================================================
+
+m.route(document.body, '/', {
+  '/': {
+    render: () => m(Layout, m(Home)),
+  },
+});
+
+const reloadConfig = () =>
+  window
+    .sendAsync('k8s.reloadConfig')
+    .then(({ contexts, currentContext }) => {
+      ClusterStream({
+        contexts: contexts.map((c) => c.cluster),
+        currentContext,
+      });
+    })
+    .catch((err) => {
+      ModalStream({
+        modal: {
+          type: 'error',
+          text: err.message || 'Something went wrong',
+          closeable: false,
+          buttons: [
+            m(Button, {
+              type: 'error',
+              text: 'Try again',
+              onclick: () => {
+                ModalStream().modal = false;
+
+                reloadConfig();
+              },
+            }),
+          ],
+        },
+      });
+    });
+
+reloadConfig();

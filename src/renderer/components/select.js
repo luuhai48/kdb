@@ -22,10 +22,10 @@ export default () => ({
         m(
           'option',
           {
-            value: option.value,
-            ...(option.selected && { selected: true }),
+            value: option,
+            ...(v.attrs.selected === option && { selected: true }),
           },
-          option.value,
+          option,
         ),
       ),
     ),
