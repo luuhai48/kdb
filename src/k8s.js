@@ -51,8 +51,19 @@ export default {
     if (!result || result.code !== 0) {
       return new Error(result.stderr);
     }
+  },
 
-    return this.reloadConfig();
+  /**
+   * Switch namespace
+   * @param {string} namespaceName
+   */
+  async setCurrentNamespace(namespaceName) {
+    const result = await exec(
+      `kubectl config set-context --current --namespace=${namespaceName}`,
+    );
+    if (!result || result.code !== 0) {
+      return new Error(result.stderr);
+    }
   },
 
   get config() {

@@ -17,6 +17,9 @@ export default () => ({
             v.attrs.class || '',
           ),
           id: v.attrs.id,
+          ...(v.attrs.onchange && {
+            onchange: v.attrs.onchange,
+          }),
         },
 
         m(

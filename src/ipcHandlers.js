@@ -50,4 +50,24 @@ export default (args) => {
       data: data.map((n) => n.metadata.name),
     };
   });
+
+  ipcMain.handle('k8s.setCurrentContext', async (_, contextName) => {
+    const err = await k8s.setCurrentContext(contextName);
+
+    if (err) {
+      return { err };
+    }
+
+    return { data: true };
+  });
+
+  ipcMain.handle('k8s.setCurrentNamespace', async (_, namespaceName) => {
+    const err = await k8s.setCurrentNamespace(namespaceName);
+
+    if (err) {
+      return { err };
+    }
+
+    return { data: true };
+  });
 };

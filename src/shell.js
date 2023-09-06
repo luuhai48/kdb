@@ -13,7 +13,9 @@ export const exec = async (cmd, callback) => {
   };
 
   return new Promise((resolve) => {
-    const proc = shelljs.exec(cmd, opts, resolve);
+    const proc = shelljs.exec(cmd, opts, (code, stdout, stderr) =>
+      resolve({ code, stdout, stderr }),
+    );
 
     if (callback) {
       callback(proc);

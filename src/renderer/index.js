@@ -30,7 +30,7 @@ m.route(document.body, '/', {
 
 // =============================================================================
 
-(async function reloadConfig() {
+window.reloadConfig = async () => {
   LoadingStream(true);
 
   ClusterStream({
@@ -54,7 +54,7 @@ m.route(document.body, '/', {
           text: 'Try again',
           onclick: () => {
             ModalStream(false);
-            reloadConfig();
+            window.reloadConfig();
           },
         }),
       ],
@@ -89,7 +89,7 @@ m.route(document.body, '/', {
           onclick: () => {
             LoadingStream(false);
             ModalStream(false);
-            reloadConfig();
+            window.reloadConfig();
           },
         }),
       ],
@@ -100,4 +100,5 @@ m.route(document.body, '/', {
   NamespaceStream(namespaces);
 
   LoadingStream(false);
-})();
+};
+window.reloadConfig();
