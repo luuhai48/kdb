@@ -8,15 +8,14 @@ import Home from './routes/home';
 
 import ModalStream from './streams/modal';
 import ClusterStream from './streams/cluster';
+import LoadingStream from './streams/loading';
 
 // =============================================================================
 
 window.api.on('err', (_, err) => {
   ModalStream({
-    modal: {
-      type: 'error',
-      text: err.message || 'Something went wrong',
-    },
+    type: 'error',
+    text: err.message || 'Something went wrong',
   });
 });
 
@@ -30,34 +29,37 @@ m.route(document.body, '/', {
 
 // =============================================================================
 
-const reloadConfig = () =>
-  window.api
-    .invoke('k8s.reloadConfig')
-    .then(({ data: { contexts, currentContext } }) => {
-      ClusterStream({
-        contexts: contexts.map((c) => c.cluster),
-        currentContext,
-      });
-    })
-    .catch((err) => {
-      ModalStream({
-        modal: {
+(async function reloadConfig() {
+  LoadingStream(true);
+
+  const { err, data } = await window.api.invoke('k8s.reloadConfig');
+
+  if (err) {
+    ModalStream({
+      type: 'error',
+      text: err.message || 'Something went wrong',
+      closeable: false,
+      buttons: [
+        m(Button, {
           type: 'error',
-          text: err.message || 'Something went wrong',
-          closeable: false,
-          buttons: [
-            m(Button, {
-              type: 'error',
-              text: 'Try again',
-              onclick: () => {
-                ModalStream().modal = false;
+          text: 'Try again',
+          onclick: () => {
+            ModalStream(false);
 
-                reloadConfig();
-              },
-            }),
-          ],
-        },
-      });
+            reloadConfig();
+          },
+        }),
+      ],
     });
+    return;
+  }
 
-reloadConfig();
+  const { contexts, currentContext } = data;
+
+  ClusterStream({
+    contexts: contexts.map((c) => c.cluster),
+    currentContext,
+  });
+
+  LoadingStream(false);
+})();

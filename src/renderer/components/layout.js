@@ -2,6 +2,7 @@ import m from 'mithril';
 
 import Modal from './modal';
 import ModalStream from '../streams/modal';
+import LoadingStream from '../streams/loading';
 
 export default function () {
   return {
@@ -39,7 +40,7 @@ export default function () {
             //               'button',
             //               {
             //                 class:
-            //                   'inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600',
+            //                   'inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200',
             //               },
             //               m('span', { class: 'sr-only' }, 'Open Menu'),
             //               m.trust(`<svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 17 14">
@@ -53,7 +54,7 @@ export default function () {
             //                 'ul',
             //                 {
             //                   class:
-            //                     'font-medium flex flex-col p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700',
+            //                     'font-medium flex flex-col p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 md:mt-0 md:border-0 md:bg-white',
             //                 },
             //                 m(
             //                   'li',
@@ -62,7 +63,7 @@ export default function () {
             //                     {
             //                       href: '#!/',
             //                       class:
-            //                         'block py-2 pl-3 pr-4 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-700 md:p-0 dark:text-white md:dark:text-blue-500',
+            //                         'block py-2 pl-3 pr-4 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-700 md:p-0',
             //                     },
             //                     'Home',
             //                   ),
@@ -74,13 +75,38 @@ export default function () {
 
         v.children,
 
-        ModalStream().modal &&
+        LoadingStream() &&
+          m(
+            'div',
+            {
+              class:
+                'fixed top-0 left-0 right-0 bottom-0 z-100 bg-gray-600 bg-opacity-90 flex justify-center items-center select-none',
+            },
+            m(
+              'div',
+              {
+                class:
+                  'select-none inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-white border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]',
+                role: 'status',
+              },
+              m(
+                'span',
+                {
+                  class:
+                    '!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]',
+                },
+                'Loading...',
+              ),
+            ),
+          ),
+
+        ModalStream() &&
           m(Modal, {
-            text: ModalStream().modal.text,
-            buttons: ModalStream().modal.buttons,
-            closeable: ModalStream().modal.closeable,
+            text: ModalStream().text,
+            buttons: ModalStream().buttons,
+            closeable: ModalStream().closeable,
             onclick: () => {
-              ModalStream().modal = false;
+              ModalStream(false);
             },
           }),
       ]),
