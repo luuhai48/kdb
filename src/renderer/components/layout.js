@@ -25,8 +25,9 @@ export default function () {
               { class: 'flex items-center' },
               m('img', {
                 src: '/src/assets/icons/png/1024x1024.png',
-                class: 'h-8 mr-3',
+                class: 'h-10 mr-3',
                 alt: 'KDB Logo',
+                draggable: false,
               }),
               m(
                 'span',

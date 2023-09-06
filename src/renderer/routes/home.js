@@ -11,15 +11,18 @@ export default function () {
         m(Select, {
           options: ClustersStream().contexts,
           selected: ClustersStream().currentContext,
-          placeholder: ' -- Select cluster -- ',
+          placeholder: 'Select cluster',
+        }),
+
+        m('div', {
+          class: 'w-5 inline-block',
         }),
 
         NamespaceStream().length &&
           m(Select, {
-            class: 'mt-2',
             options: NamespaceStream(),
             selected: ClustersStream().currentNamespace || 'default',
-            placeholder: ' -- Select namespace -- ',
+            placeholder: 'Select namespace',
           }),
       ]),
   };
