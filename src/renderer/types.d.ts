@@ -18,12 +18,11 @@ declare global {
        * Send an event to backend
        */
       send: (channel: string, ...args: any[]) => void;
-    };
 
-    sendAsync: (
-      channel: string,
-      data?: Record<string, any>,
-      opts?: { timeoutMs: number },
-    ) => Promise<any>;
+      /**
+       * Send an event to backend and wait for response
+       */
+      invoke: (channel: string, ...args: any[]) => Promise<any>;
+    };
   }
 }

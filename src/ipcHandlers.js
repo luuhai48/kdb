@@ -5,44 +5,37 @@ import k8s from './k8s';
 /**
  * @param {{window: () => import('electron').BrowserWindow}}
  */
+// eslint-disable-next-line no-unused-vars
 export default ({ window }) => {
-  ipcMain.on('k8s.reloadConfig', async (_, { id }) => {
+  ipcMain.handle('k8s.reloadConfig', async () => {
     const err = await k8s.reloadConfig();
 
     if (err) {
-      return window().webContents.send('event', {
-        channel: 'k8s.reloadConfig',
-        id,
+      return {
         err,
-      });
+      };
     }
 
-    return window().webContents.send('event', {
-      channel: 'k8s.reloadConfig',
-      id,
+    return {
       data: {
         contexts: k8s.config.contexts,
         currentContext: k8s.config.currentContext,
       },
-    });
+    };
   });
 
-  ipcMain.on('k8s.getClusters', async (_, { id }) => {
+  ipcMain.handle('k8s.getClusters', async () => {
     if (!k8s.config || !k8s.api) {
-      return window().webContents.send('event', {
-        channel: 'k8s.getClusters',
-        id,
+      return {
         err: new Error('Invalid kube config'),
-      });
+      };
     }
 
-    return window().webContents.send('event', {
-      channel: 'k8s.getClusters',
-      id,
+    return {
       data: {
         contexts: k8s.config.contexts,
         currentContext: k8s.config.currentContext,
       },
-    });
+    };
   });
 };

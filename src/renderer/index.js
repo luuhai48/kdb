@@ -16,66 +16,9 @@ window.api.on('err', (_, err) => {
     modal: {
       type: 'error',
       text: err.message || 'Something went wrong',
-      closeable: false,
-      buttons: [
-        m(Button, {
-          type: 'error',
-          pill: true,
-          text: 'Try again',
-          onclick: () => {
-            window.api.send('k8s.reloadConfig');
-            ModalStream().modal = false;
-          },
-        }),
-      ],
     },
   });
 });
-
-/** @type {[key: string]: any} */
-const awaits = {};
-
-window.api.on('event', (_, args) => {
-  const { channel, id, err, data } = args;
-
-  if (!awaits[channel] || !awaits[channel][id]) return;
-
-  const { resolve, reject } = awaits[channel][id];
-  delete awaits[channel][id];
-
-  if (err) {
-    return reject(err);
-  }
-  return resolve(data);
-});
-
-window.sendAsync = async (
-  channel,
-  data = {},
-  { timeoutMs } = { timeoutMs: 5_000 },
-) => {
-  if (!awaits[channel]) {
-    awaits[channel] = {};
-  }
-
-  const id = window.crypto.randomUUID();
-  window.api.send(channel, { ...data, id });
-
-  const result = await Promise.race([
-    new Promise((resolve, reject) => {
-      awaits[channel][id] = { resolve, reject };
-    }),
-
-    new Promise((_, reject) =>
-      setTimeout(() => {
-        delete awaits[channel][id];
-        return reject(new Error(`Timeout waiting for event on "${channel}"`));
-      }, timeoutMs),
-    ),
-  ]);
-
-  return result;
-};
 
 // =============================================================================
 
@@ -85,10 +28,12 @@ m.route(document.body, '/', {
   },
 });
 
+// =============================================================================
+
 const reloadConfig = () =>
-  window
-    .sendAsync('k8s.reloadConfig')
-    .then(({ contexts, currentContext }) => {
+  window.api
+    .invoke('k8s.reloadConfig')
+    .then(({ data: { contexts, currentContext } }) => {
       ClusterStream({
         contexts: contexts.map((c) => c.cluster),
         currentContext,
