@@ -7,8 +7,9 @@ import Button from './components/button';
 import Home from './routes/home';
 
 import ModalStream from './streams/modal';
-import ClusterStream from './streams/cluster';
 import LoadingStream from './streams/loading';
+import ClusterStream from './streams/cluster';
+import NamespaceStream from './streams/namespace';
 
 // =============================================================================
 
@@ -32,9 +33,17 @@ m.route(document.body, '/', {
 (async function reloadConfig() {
   LoadingStream(true);
 
+  ClusterStream({
+    contexts: [],
+    currentContext: '',
+  });
+  NamespaceStream([]);
+
   const { err, data } = await window.api.invoke('k8s.reloadConfig');
 
   if (err) {
+    LoadingStream(false);
+
     ModalStream({
       type: 'error',
       text: err.message || 'Something went wrong',
@@ -45,7 +54,6 @@ m.route(document.body, '/', {
           text: 'Try again',
           onclick: () => {
             ModalStream(false);
-
             reloadConfig();
           },
         }),
@@ -56,10 +64,40 @@ m.route(document.body, '/', {
 
   const { contexts, currentContext } = data;
 
+  const currentContextObj = contexts.find((c) => c.cluster === currentContext);
+
   ClusterStream({
     contexts: contexts.map((c) => c.cluster),
     currentContext,
+    currentNamespace: currentContextObj?.namespace,
   });
+
+  const { err: namespaceErr, data: namespaces } =
+    await window.api.invoke('k8s.getNamespaces');
+
+  if (namespaceErr) {
+    LoadingStream(false);
+
+    ModalStream({
+      type: 'error',
+      text: err.message || 'Something went wrong',
+      closeable: false,
+      buttons: [
+        m(Button, {
+          type: 'error',
+          text: 'Try again',
+          onclick: () => {
+            LoadingStream(false);
+            ModalStream(false);
+            reloadConfig();
+          },
+        }),
+      ],
+    });
+    return;
+  }
+
+  NamespaceStream(namespaces);
 
   LoadingStream(false);
 })();

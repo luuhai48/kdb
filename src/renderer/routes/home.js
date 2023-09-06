@@ -2,6 +2,7 @@ import m from 'mithril';
 
 import Select from '../components/select';
 import ClustersStream from '../streams/cluster';
+import NamespaceStream from '../streams/namespace';
 
 export default function () {
   return {
@@ -12,6 +13,14 @@ export default function () {
           selected: ClustersStream().currentContext,
           placeholder: ' -- Select cluster -- ',
         }),
+
+        NamespaceStream().length &&
+          m(Select, {
+            class: 'mt-2',
+            options: NamespaceStream(),
+            selected: ClustersStream().currentNamespace || 'default',
+            placeholder: ' -- Select namespace -- ',
+          }),
       ]),
   };
 }

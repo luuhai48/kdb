@@ -1,4 +1,5 @@
 import m from 'mithril';
+import { twMerge } from 'tailwind-merge';
 
 export default () => ({
   /**
@@ -8,8 +9,10 @@ export default () => ({
     m(
       'select',
       {
-        class:
+        class: twMerge(
           'cursor-pointer bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5',
+          v.attrs.class || '',
+        ),
       },
 
       m(

@@ -5,6 +5,7 @@ const clusters = stream({
   /** @type {string[]} */
   contexts: [],
   currentContext: '',
+  currentNamespace: 'default',
 });
 
 clusters.map(() => m.redraw());
