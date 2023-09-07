@@ -8,6 +8,8 @@ const whitelistInvokeChannels = [
   'k8s.getNamespaces',
   'k8s.setCurrentContext',
   'k8s.setCurrentNamespace',
+  'k8s.getSecrets',
+  'k8s.readSecret',
 ];
 
 contextBridge.exposeInMainWorld('api', {

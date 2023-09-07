@@ -70,4 +70,30 @@ export default (args) => {
 
     return { data: true };
   });
+
+  ipcMain.handle('k8s.getSecrets', async (_, namespace) => {
+    try {
+      const data = await k8s.api
+        .listNamespacedSecret(namespace)
+        .then((r) => r.body.items);
+
+      return {
+        data: data.map((s) => s.metadata.name),
+      };
+    } catch (err) {
+      return { err };
+    }
+  });
+
+  ipcMain.handle('k8s.readSecret', async (_, secretName, namespace) => {
+    try {
+      const data = await k8s.api
+        .readNamespacedSecret(secretName, namespace)
+        .then((r) => r.body);
+
+      return { data };
+    } catch (err) {
+      return { err };
+    }
+  });
 };

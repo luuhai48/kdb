@@ -44,6 +44,7 @@
     "electron-squirrel-startup": "^1.0.0",
     "mithril": "^2.2.2",
     "shelljs": "^0.8.5",
-    "utf-8-validate": "^6.0.3"
+    "utf-8-validate": "^6.0.3",
+    "yaml": "^2.3.2"
   }
 }

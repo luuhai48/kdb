@@ -22,11 +22,12 @@ export default () => ({
           }),
         },
 
-        m(
-          'option',
-          { selected: true, disabled: true },
-          ` -- ${v.attrs.placeholder || 'Select value'} -- `,
-        ),
+        v.attrs.placeholder &&
+          m(
+            'option',
+            { selected: true, disabled: true },
+            ` -- ${v.attrs.placeholder || 'Select value'} -- `,
+          ),
 
         ...(v.attrs.options || []).map((option) =>
           m(
@@ -40,12 +41,13 @@ export default () => ({
         ),
       ),
 
-      m(
-        'label',
-        {
-          class: 'absolute -top-7 left-1',
-        },
-        v.attrs.placeholder ?? 'Select value',
-      ),
+      v.attrs.label &&
+        m(
+          'label',
+          {
+            class: 'absolute -top-7 left-1',
+          },
+          v.attrs.label,
+        ),
     ),
 });

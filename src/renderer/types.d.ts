@@ -22,7 +22,10 @@ declare global {
       /**
        * Send an event to backend and wait for response
        */
-      invoke: (channel: string, ...args: any[]) => Promise<any>;
+      invoke: (
+        channel: string,
+        ...args: any[]
+      ) => Promise<{ err?: Error; data: any }>;
     };
   }
 }
