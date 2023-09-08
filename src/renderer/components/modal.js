@@ -65,14 +65,18 @@ export default function () {
 
               v.attrs.code &&
                 m(
-                  'pre',
-                  {
-                    class: 'text-left p-2 overflow-auto text-sm',
-                  },
-                  m.trust(
-                    hljs.highlight(v.attrs.code, {
-                      language: v.attrs.codeLanguage,
-                    }).value,
+                  'div',
+                  { class: 'border border-gray-200 mb-3' },
+                  m(
+                    'pre',
+                    {
+                      class: 'text-left p-2 overflow-auto text-sm',
+                    },
+                    m.trust(
+                      hljs.highlight(v.attrs.code, {
+                        language: v.attrs.codeLanguage,
+                      }).value,
+                    ),
                   ),
                 ),
 

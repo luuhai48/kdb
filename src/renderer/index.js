@@ -6,6 +6,8 @@ import 'highlight.js/styles/atom-one-light.css';
 import Layout from './components/layout';
 import Button from './components/button';
 import Home from './routes/home';
+import Secrets from './routes/secrets';
+import Pods from './routes/pods';
 
 import ModalStream from './streams/modal';
 import LoadingStream from './streams/loading';
@@ -26,6 +28,12 @@ window.api.on('err', (_, err) => {
 m.route(document.body, '/', {
   '/': {
     render: () => m(Layout, m(Home)),
+  },
+  '/secrets': {
+    render: () => m(Layout, m(Secrets)),
+  },
+  '/pods': {
+    render: () => m(Layout, m(Pods)),
   },
 });
 

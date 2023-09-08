@@ -2,7 +2,7 @@ import m from 'mithril';
 import { twMerge } from 'tailwind-merge';
 
 const defaultClasses =
-  'select-none text-white font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300';
+  'select-none text-white font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 active:bg-blue-600';
 
 const pillClasses = 'rounded-full';
 
@@ -10,17 +10,19 @@ const classes = {
   default: defaultClasses,
   success: twMerge(
     defaultClasses,
-    'bg-green-700 hover:bg-green-800 focus:ring-green-300',
+    'bg-green-700 hover:bg-green-800 focus:ring-green-300 active:bg-green-600',
   ),
   error: twMerge(
     defaultClasses,
-    'bg-red-700 hover:bg-red-800 focus:ring-red-300',
+    'bg-red-700 hover:bg-red-800 focus:ring-red-300 active:bg-red-600',
   ),
   warning: twMerge(
     defaultClasses,
-    'bg-yellow-400 hover:bg-yellow-500 focus:ring-yellow-300',
+    'bg-yellow-400 hover:bg-yellow-500 focus:ring-yellow-300 active:bg-yello-600',
   ),
-  copy: 'inline-flex items-center px-3 py-2 text-xs text-gray-600 hover:text-blue-700 border rounded-full',
+  copy: 'inline-flex items-center px-3 py-2 text-xs text-gray-600 hover:text-blue-700 border rounded-lg active:bg-gray-200',
+  noBorder:
+    'inline-flex p-2 text-xs font-medium text-gray-600 hover:text-blue-700 rounded-lg hover:bg-gray-100 active:bg-gray-200',
 };
 
 export default function () {
@@ -37,6 +39,7 @@ export default function () {
             v.attrs.pill ? pillClasses : '',
             v.attrs.class || '',
           ),
+          title: v.attrs.title,
           onclick: (e) => {
             if (v.attrs.onclick) {
               v.attrs.onclick(e);
@@ -65,6 +68,7 @@ export default function () {
               v.attrs.text,
             ]
           : v.attrs.text,
+        v.children,
       ),
   };
 }

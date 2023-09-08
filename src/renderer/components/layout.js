@@ -1,4 +1,5 @@
 import m from 'mithril';
+import { twMerge } from 'tailwind-merge';
 
 import Modal from './modal';
 import Select from './select';
@@ -20,7 +21,7 @@ export default function () {
      * @param {import('mithril').Vnode} v
      */
     view: (v) =>
-      m('main', { class: '' }, [
+      m('main', [
         m(
           'nav',
           { class: 'bg-white border-b border-gray-200' },
@@ -46,40 +47,6 @@ export default function () {
                 'KDB',
               ),
             ),
-            //             m(
-            //               'button',
-            //               {
-            //                 class:
-            //                   'inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200',
-            //               },
-            //               m('span', { class: 'sr-only' }, 'Open Menu'),
-            //               m.trust(`<svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 17 14">
-            //     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 1h15M1 7h15M1 13h15"/>
-            // </svg>`),
-            //             ),
-            //             m(
-            //               'div',
-            //               { class: 'hidden w-full md:block md:w-auto' },
-            //               m(
-            //                 'ul',
-            //                 {
-            //                   class:
-            //                     'font-medium flex flex-col p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 md:mt-0 md:border-0 md:bg-white',
-            //                 },
-            //                 m(
-            //                   'li',
-            //                   m(
-            //                     'a',
-            //                     {
-            //                       href: '#!/',
-            //                       class:
-            //                         'block py-2 pl-3 pr-4 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-700 md:p-0',
-            //                     },
-            //                     'Home',
-            //                   ),
-            //                 ),
-            //               ),
-            //             ),
           ),
         ),
 
@@ -132,7 +99,78 @@ export default function () {
             }),
         ]),
 
-        v.children,
+        m('div', { class: 'mx-auto p-4' }, [
+          m(
+            'div',
+            {
+              class: 'flex',
+            },
+            [
+              m(
+                'ul',
+                {
+                  class:
+                    'flex flex-col -mb-px text-sm font-medium text-center border-r w-40 pr-6',
+                },
+                [
+                  m(
+                    'li',
+                    m(
+                      'button',
+                      {
+                        id: 'secrets',
+                        type: 'button',
+                        role: 'tab',
+                        class: twMerge(
+                          'w-full text-center inline-block px-4 py-2 rounded-lg text-gray-700 hover:text-black hover:bg-gray-200 font-medium',
+                          ...(m.route.get() === '/secrets'
+                            ? ['bg-gray-100 text-black']
+                            : []),
+                        ),
+                        onclick: async () => {
+                          if (m.route.get() === '/secrets') return;
+                          m.route.set('/secrets');
+                        },
+                      },
+                      'Secrets',
+                    ),
+                  ),
+                  m(
+                    'li',
+                    { class: 'mt-2' },
+                    m(
+                      'button',
+                      {
+                        id: 'pods',
+                        type: 'button',
+                        role: 'tab',
+                        class: twMerge(
+                          'w-full text-center inline-block px-4 py-2 rounded-lg text-gray-700 hover:text-black hover:bg-gray-200 font-medium',
+                          ...(m.route.get() === '/pods'
+                            ? ['bg-gray-100 text-black']
+                            : []),
+                        ),
+                        onclick: () => {
+                          if (m.route.get() === '/pods') return;
+                          m.route.set('/pods');
+                        },
+                      },
+                      'Pods',
+                    ),
+                  ),
+                ],
+              ),
+
+              m(
+                'div',
+                {
+                  class: 'flex w-full relative overflow-hidden',
+                },
+                v.children,
+              ),
+            ],
+          ),
+        ]),
 
         LoadingStream() &&
           m(

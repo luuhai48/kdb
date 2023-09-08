@@ -13,7 +13,7 @@ export default () => ({
         'select',
         {
           class: twMerge(
-            'cursor-pointer bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5',
+            'cursor-pointer bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500',
             v.attrs.class || '',
           ),
           id: v.attrs.id,
