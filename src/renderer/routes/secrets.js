@@ -113,44 +113,49 @@ export default function () {
             </svg>`),
             ),
           ]),
-          m(
-            'ul',
-            { class: 'mt-5' },
-            (search
-              ? listResources.filter((n) => n.includes(search))
-              : listResources
-            ).map((name) =>
-              m(
-                'li',
-                m(
-                  'button',
-                  {
-                    class: 'hover:underline',
-                    disabled,
-                    onclick: async () => {
-                      disabled = true;
 
-                      const { err, data } = await window.api.invoke(
-                        'k8s.readSecret',
-                        name,
-                        ClusterStream().currentNamespace || 'default',
-                      );
+          disabled
+            ? m('h3', { class: 'mt-4' }, 'Loading ...')
+            : listResources.length === 0
+            ? m('h3', { class: 'mt-4' }, 'No resource found')
+            : m(
+                'ul',
+                { class: 'mt-5' },
+                (search
+                  ? listResources.filter((n) => n.includes(search))
+                  : listResources
+                ).map((name) =>
+                  m(
+                    'li',
+                    m(
+                      'button',
+                      {
+                        class: 'hover:underline',
+                        disabled,
+                        onclick: async () => {
+                          disabled = true;
 
-                      disabled = false;
-                      if (err) {
-                        m.redraw();
-                        return showError(err);
-                      }
+                          const { err, data } = await window.api.invoke(
+                            'k8s.readSecret',
+                            name,
+                            ClusterStream().currentNamespace || 'default',
+                          );
 
-                      selectedResouce = data;
-                      m.redraw();
-                    },
-                  },
-                  name,
+                          disabled = false;
+                          if (err) {
+                            m.redraw();
+                            return showError(err);
+                          }
+
+                          selectedResouce = data;
+                          m.redraw();
+                        },
+                      },
+                      name,
+                    ),
+                  ),
                 ),
               ),
-            ),
-          ),
         ],
       ),
 
