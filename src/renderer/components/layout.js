@@ -1,10 +1,20 @@
 import m from 'mithril';
 
 import Modal from './modal';
+import Select from './select';
 import ModalStream from '../streams/modal';
+import ClusterStream from '../streams/cluster';
+import NamespaceStream from '../streams/namespace';
 import LoadingStream from '../streams/loading';
 
 export default function () {
+  const showError = (err) => {
+    ModalStream({
+      type: 'error',
+      text: err.message || 'Something went wrong',
+    });
+  };
+
   return {
     /**
      * @param {import('mithril').Vnode} v
@@ -72,6 +82,55 @@ export default function () {
             //             ),
           ),
         ),
+
+        m('div', { class: 'mx-auto p-4' }, [
+          m(Select, {
+            options: ClusterStream().contexts,
+            selected: ClusterStream().currentContext,
+            label: 'Cluster',
+            onchange: async (e) => {
+              LoadingStream(true);
+
+              const { err } = await window.api.invoke(
+                'k8s.setCurrentContext',
+                e.target.value,
+              );
+
+              if (err) {
+                LoadingStream(false);
+                return showError(err);
+              }
+
+              window.reloadConfig();
+            },
+          }),
+
+          m('div', {
+            class: 'w-5 inline-block',
+          }),
+
+          NamespaceStream().length > 0 &&
+            m(Select, {
+              options: NamespaceStream(),
+              selected: ClusterStream().currentNamespace,
+              label: 'Namespace',
+              onchange: async (e) => {
+                LoadingStream(true);
+
+                const { err } = await window.api.invoke(
+                  'k8s.setCurrentNamespace',
+                  e.target.value,
+                );
+
+                if (err) {
+                  LoadingStream(false);
+                  return showError(err);
+                }
+
+                window.reloadConfig();
+              },
+            }),
+        ]),
 
         v.children,
 

@@ -4,13 +4,11 @@ import { twMerge } from 'tailwind-merge';
 import yaml from 'yaml';
 import hljs from 'highlight.js';
 
-import Select from '../components/select';
 import Button from '../components/button';
 
 import ClusterStream from '../streams/cluster';
 import NamespaceStream from '../streams/namespace';
 import ModalStream from '../streams/modal';
-import LoadingStream from '../streams/loading';
 
 export default function () {
   let selectedBtn;
@@ -50,57 +48,10 @@ export default function () {
   return {
     view: () =>
       m('div', { class: 'mx-auto p-4' }, [
-        m(Select, {
-          options: ClusterStream().contexts,
-          selected: ClusterStream().currentContext,
-          label: 'Cluster',
-          onchange: async (e) => {
-            LoadingStream(true);
-
-            const { err } = await window.api.invoke(
-              'k8s.setCurrentContext',
-              e.target.value,
-            );
-
-            if (err) {
-              LoadingStream(false);
-              return showError(err);
-            }
-
-            window.reloadConfig();
-          },
-        }),
-
-        m('div', {
-          class: 'w-5 inline-block',
-        }),
-
-        NamespaceStream().length > 0 &&
-          m(Select, {
-            options: NamespaceStream(),
-            selected: ClusterStream().currentNamespace,
-            label: 'Namespace',
-            onchange: async (e) => {
-              LoadingStream(true);
-
-              const { err } = await window.api.invoke(
-                'k8s.setCurrentNamespace',
-                e.target.value,
-              );
-
-              if (err) {
-                LoadingStream(false);
-                return showError(err);
-              }
-
-              window.reloadConfig();
-            },
-          }),
-
         m(
           'div',
           {
-            class: 'mt-8 flex',
+            class: 'flex',
           },
           [
             m(
@@ -279,8 +230,7 @@ export default function () {
                     m(
                       'div',
                       {
-                        class:
-                          'whitespace-pre leading-6 ml-6 relative mt-[60px]',
+                        class: 'whitespace-pre leading-6 ml-6 relative mt-10',
                       },
 
                       selectedResouce &&
@@ -288,7 +238,7 @@ export default function () {
                           'div',
                           {
                             class:
-                              'absolute -top-[3.75rem] left-0 flex w-full items-center',
+                              'absolute -top-[2.5rem] left-0 flex w-full items-center',
                           },
                           [
                             m(
