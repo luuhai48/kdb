@@ -1,7 +1,8 @@
 import m from 'mithril';
+import { twMerge } from 'tailwind-merge';
+import hljs from 'highlight.js';
 
 import ModalStream from '../streams/modal';
-import { twMerge } from 'tailwind-merge';
 
 export default function () {
   return {
@@ -20,8 +21,8 @@ export default function () {
           'div',
           {
             class: twMerge(
-              'relative w-full max-h-full',
-              v.attrs.fullWidth ? '' : 'max-w-md',
+              'relative max-h-full',
+              v.attrs.fullWidth ? 'w-full' : 'max-w-md',
             ),
           },
 
@@ -62,7 +63,18 @@ export default function () {
                   v.attrs.text,
                 ),
 
-              v.attrs.html && m.trust(v.attrs.html),
+              v.attrs.code &&
+                m(
+                  'pre',
+                  {
+                    class: 'text-left p-2 overflow-auto text-sm',
+                  },
+                  m.trust(
+                    hljs.highlight(v.attrs.code, {
+                      language: v.attrs.codeLanguage,
+                    }).value,
+                  ),
+                ),
 
               ...(v.attrs?.buttons || []),
             ),

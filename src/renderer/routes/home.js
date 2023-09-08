@@ -1,8 +1,8 @@
 /// <reference path="../types.d.ts"/>
 import m from 'mithril';
 import { twMerge } from 'tailwind-merge';
-
 import yaml from 'yaml';
+import hljs from 'highlight.js';
 
 import Select from '../components/select';
 import Button from '../components/button';
@@ -29,7 +29,7 @@ export default function () {
 
   return {
     view: () =>
-      m('div', { class: 'max-w-screen-xl mx-auto p-4' }, [
+      m('div', { class: 'mx-auto p-4' }, [
         m(Select, {
           options: ClusterStream().contexts,
           selected: ClusterStream().currentContext,
@@ -164,7 +164,7 @@ export default function () {
             m(
               'div',
               {
-                class: 'flex min-w-full relative overflow-hidden',
+                class: 'flex w-full relative overflow-hidden',
               },
               [
                 m(
@@ -186,8 +186,8 @@ export default function () {
                             'absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none',
                         },
                         m.trust(`<svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
-                </svg>`),
+                          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
+                        </svg>`),
                       ),
                       m('input', {
                         type: 'search',
@@ -275,22 +275,22 @@ export default function () {
                               'button',
                               {
                                 class:
-                                  'p-2 text-xs font-medium text-gray-600 hover:text-blue-700 h-10 rounded-full hover:bg-gray-100',
+                                  'px-3 text-xs font-medium text-gray-600 hover:text-blue-700 h-10 rounded-full hover:bg-gray-100',
                                 title: 'Go back',
                                 onclick: () => {
                                   selectedResouce = null;
                                 },
                               },
-                              m.trust(`<svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 8 14">
-                          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 1 1.3 6.326a.91.91 0 0 0 0 1.348L7 13"></path>
-                      </svg>`),
+                              m.trust(`<svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 8 14">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 1 1.3 6.326a.91.91 0 0 0 0 1.348L7 13"></path>
+                              </svg>`),
                             ),
 
                             m(
                               'button',
                               {
                                 class:
-                                  'px-3 py-2 text-xs font-medium text-gray-600 hover:text-blue-700 h-10 ml-auto rounded-full hover:bg-gray-100',
+                                  'px-3 py-2 text-xs font-medium text-gray-600 hover:text-blue-700 h-8 ml-auto rounded-full hover:bg-gray-100',
                                 onclick: () => {
                                   const doc = new yaml.Document();
                                   delete selectedResouce['metadata'][
@@ -300,7 +300,8 @@ export default function () {
 
                                   ModalStream({
                                     fullWidth: true,
-                                    html: `<div class="whitespace-pre leading-6 text-left">${doc.toString()}</div>`,
+                                    code: doc.toString(),
+                                    codeLanguage: 'yaml',
                                     buttons: [
                                       m(Button, {
                                         type: 'copy',
@@ -321,7 +322,7 @@ export default function () {
                             m(Button, {
                               type: 'copy',
                               text: 'Copy',
-                              class: 'h-10 ml-2',
+                              class: 'h-8 ml-2',
                               onclick: () => {
                                 const parsedSecrets = Object.entries(
                                   selectedResouce.data,
@@ -338,27 +339,20 @@ export default function () {
                       selectedResouce &&
                         m(
                           'div',
-                          { class: 'w-full' },
-                          Object.entries(selectedResouce.data).map(
-                            ([key, val]) =>
-                              m('div', [
-                                m(
-                                  'span',
-                                  {
-                                    class: 'text-blue-500',
-                                    spellcheck: false,
-                                  },
-                                  key,
-                                ),
-                                m('span', { class: 'text-teal-400' }, '='),
-                                m(
-                                  'span',
-                                  {
-                                    spellcheck: false,
-                                  },
-                                  atob(val),
-                                ),
-                              ]),
+                          m(
+                            'pre',
+                            {
+                              class:
+                                'w-full text-left p-2 overflow-auto text-sm',
+                            },
+                            m.trust(
+                              hljs.highlight(
+                                Object.entries(selectedResouce.data)
+                                  .map(([key, val]) => `${key}=${atob(val)}`)
+                                  .join('\n'),
+                                { language: 'properties' },
+                              ).value,
+                            ),
                           ),
                         ),
                     ),
