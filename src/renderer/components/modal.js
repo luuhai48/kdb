@@ -1,6 +1,7 @@
 import m from 'mithril';
 
 import ModalStream from '../streams/modal';
+import { twMerge } from 'tailwind-merge';
 
 export default function () {
   return {
@@ -18,7 +19,10 @@ export default function () {
         m(
           'div',
           {
-            class: 'relative w-full max-w-md max-h-full',
+            class: twMerge(
+              'relative w-full max-h-full',
+              v.attrs.fullWidth ? '' : 'max-w-md',
+            ),
           },
 
           m(
@@ -43,16 +47,23 @@ export default function () {
             m(
               'div',
               { class: 'p-6 text-center' },
-              m.trust(`<svg class="mx-auto mb-4 text-gray-400 w-12 h-12" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 11V6m0 8h.01M19 10a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
-  </svg>`),
-              m(
-                'h3',
-                {
-                  class: 'mb-5 text-lg font-normal text-gray-500',
-                },
-                v.attrs.text,
-              ),
+
+              v.attrs.type === 'error' &&
+                m.trust(`<svg class="mx-auto mb-4 text-gray-400 w-12 h-12" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 11V6m0 8h.01M19 10a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+                </svg>`),
+
+              v.attrs.text &&
+                m(
+                  'h3',
+                  {
+                    class: 'mb-5 text-lg font-normal text-gray-500',
+                  },
+                  v.attrs.text,
+                ),
+
+              v.attrs.html && m.trust(v.attrs.html),
+
               ...(v.attrs?.buttons || []),
             ),
           ),

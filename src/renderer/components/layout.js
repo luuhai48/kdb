@@ -103,9 +103,7 @@ export default function () {
 
         ModalStream() &&
           m(Modal, {
-            text: ModalStream().text,
-            buttons: ModalStream().buttons,
-            closeable: ModalStream().closeable,
+            ...ModalStream(),
             onclick: () => {
               ModalStream(false);
             },

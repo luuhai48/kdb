@@ -5,7 +5,9 @@ import { twMerge } from 'tailwind-merge';
 import yaml from 'yaml';
 
 import Select from '../components/select';
-import ClustersStream from '../streams/cluster';
+import Button from '../components/button';
+
+import ClusterStream from '../streams/cluster';
 import NamespaceStream from '../streams/namespace';
 import ModalStream from '../streams/modal';
 import LoadingStream from '../streams/loading';
@@ -29,8 +31,8 @@ export default function () {
     view: () =>
       m('div', { class: 'max-w-screen-xl mx-auto p-4' }, [
         m(Select, {
-          options: ClustersStream().contexts,
-          selected: ClustersStream().currentContext,
+          options: ClusterStream().contexts,
+          selected: ClusterStream().currentContext,
           label: 'Cluster',
           onchange: async (e) => {
             LoadingStream(true);
@@ -56,7 +58,7 @@ export default function () {
         NamespaceStream().length > 0 &&
           m(Select, {
             options: NamespaceStream(),
-            selected: ClustersStream().currentNamespace || 'default',
+            selected: ClusterStream().currentNamespace,
             label: 'Namespace',
             onchange: async (e) => {
               LoadingStream(true);
@@ -98,7 +100,7 @@ export default function () {
                       type: 'button',
                       role: 'tab',
                       class: twMerge(
-                        'w-full text-left inline-block px-4 py-2 rounded-full text-gray-700 hover:text-black hover:bg-gray-200',
+                        'w-full text-center inline-block px-4 py-2 rounded-full text-gray-700 hover:text-black hover:bg-gray-200 font-medium',
                         ...(selected === 'btn-secrets'
                           ? ['bg-gray-100 text-black']
                           : []),
@@ -114,7 +116,7 @@ export default function () {
 
                         const { err, data } = await window.api.invoke(
                           'k8s.getSecrets',
-                          ClustersStream().currentNamespace || 'default',
+                          ClusterStream().currentNamespace,
                         );
 
                         disabled = false;
@@ -140,7 +142,7 @@ export default function () {
                       type: 'button',
                       role: 'tab',
                       class: twMerge(
-                        'w-full text-left inline-block px-4 py-2 rounded-full text-gray-700 hover:text-black hover:bg-gray-200',
+                        'w-full text-center inline-block px-4 py-2 rounded-full text-gray-700 hover:text-black hover:bg-gray-200 font-medium',
                         ...(selected === 'btn-workloads'
                           ? ['bg-gray-100 text-black']
                           : []),
@@ -222,8 +224,7 @@ export default function () {
                                 const { err, data } = await window.api.invoke(
                                   'k8s.readSecret',
                                   name,
-                                  ClustersStream().currentNamespace ||
-                                    'default',
+                                  ClusterStream().currentNamespace || 'default',
                                 );
 
                                 disabled = false;
@@ -296,47 +297,41 @@ export default function () {
                                     'managedFields'
                                   ];
                                   doc.contents = selectedResouce;
-                                  console.log(doc.toString());
+
+                                  ModalStream({
+                                    fullWidth: true,
+                                    html: `<div class="whitespace-pre leading-6 text-left">${doc.toString()}</div>`,
+                                    buttons: [
+                                      m(Button, {
+                                        type: 'copy',
+                                        text: 'Copy',
+                                        onclick: () => {
+                                          navigator.clipboard.writeText(
+                                            doc.toString(),
+                                          );
+                                        },
+                                      }),
+                                    ],
+                                  });
                                 },
                               },
                               'Raw value',
                             ),
 
-                            m(
-                              'button',
-                              {
-                                class:
-                                  'inline-flex items-center px-3 py-2 text-xs font-medium text-gray-600 hover:text-blue-700 border h-10 rounded-full ml-2',
-                                onclick: (e) => {
-                                  const parsedSecrets = Object.entries(
-                                    selectedResouce.data,
-                                  )
-                                    .map(([key, val]) => `${key}=${atob(val)}`)
-                                    .join('\n');
+                            m(Button, {
+                              type: 'copy',
+                              text: 'Copy',
+                              class: 'h-10 ml-2',
+                              onclick: () => {
+                                const parsedSecrets = Object.entries(
+                                  selectedResouce.data,
+                                )
+                                  .map(([key, val]) => `${key}=${atob(val)}`)
+                                  .join('\n');
 
-                                  navigator.clipboard.writeText(parsedSecrets);
-                                  e.target.innerHTML =
-                                    e.target.innerHTML.replace(
-                                      `Copy`,
-                                      `Copied`,
-                                    );
-                                  setTimeout(() => {
-                                    e.target.innerHTML =
-                                      e.target.innerHTML.replace(
-                                        `Copied`,
-                                        `Copy`,
-                                      );
-                                  }, 3000);
-                                },
+                                navigator.clipboard.writeText(parsedSecrets);
                               },
-                              [
-                                m.trust(`<svg class="w-3.5 h-3.5 mr-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 18 20">
-                        <path d="M5 9V4.13a2.96 2.96 0 0 0-1.293.749L.879 7.707A2.96 2.96 0 0 0 .13 9H5Zm11.066-9H9.829a2.98 2.98 0 0 0-2.122.879L7 1.584A.987.987 0 0 0 6.766 2h4.3A3.972 3.972 0 0 1 15 6v10h1.066A1.97 1.97 0 0 0 18 14V2a1.97 1.97 0 0 0-1.934-2Z"></path>
-                        <path d="M11.066 4H7v5a2 2 0 0 1-2 2H0v7a1.969 1.969 0 0 0 1.933 2h9.133A1.97 1.97 0 0 0 13 18V6a1.97 1.97 0 0 0-1.934-2Z"></path>
-                      </svg>`),
-                                'Copy',
-                              ],
-                            ),
+                            }),
                           ],
                         ),
 

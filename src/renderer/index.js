@@ -36,6 +36,7 @@ window.reloadConfig = async () => {
   ClusterStream({
     contexts: [],
     currentContext: '',
+    currentNamespace: 'default',
   });
   NamespaceStream([]);
 
@@ -69,7 +70,7 @@ window.reloadConfig = async () => {
   ClusterStream({
     contexts: contexts.map((c) => c.cluster),
     currentContext,
-    currentNamespace: currentContextObj?.namespace,
+    currentNamespace: currentContextObj?.namespace || 'default',
   });
 
   const { err: namespaceErr, data: namespaces } =
