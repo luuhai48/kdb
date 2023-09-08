@@ -13,12 +13,32 @@ import ModalStream from '../streams/modal';
 import LoadingStream from '../streams/loading';
 
 export default function () {
-  let selected;
+  let selectedBtn;
   let disabled = false;
 
   let search;
   let listResources = [];
   let selectedResouce;
+
+  ClusterStream.map(() => {
+    search = null;
+    selectedResouce = null;
+    listResources = [];
+    disabled = false;
+    selectedBtn = null;
+
+    m.redraw();
+  });
+
+  NamespaceStream.map(() => {
+    search = null;
+    selectedResouce = null;
+    listResources = [];
+    disabled = false;
+    selectedBtn = null;
+
+    m.redraw();
+  });
 
   const showError = (err) => {
     ModalStream({
@@ -101,16 +121,16 @@ export default function () {
                       role: 'tab',
                       class: twMerge(
                         'w-full text-center inline-block px-4 py-2 rounded-full text-gray-700 hover:text-black hover:bg-gray-200 font-medium',
-                        ...(selected === 'btn-secrets'
+                        ...(selectedBtn === 'btn-secrets'
                           ? ['bg-gray-100 text-black']
                           : []),
                       ),
                       disabled,
                       onclick: async (e) => {
-                        if (selected === e.target.id) return;
+                        if (selectedBtn === e.target.id) return;
 
                         disabled = true;
-                        selected = e.target.id;
+                        selectedBtn = e.target.id;
                         listResources = [];
                         selectedResouce = null;
 
@@ -143,13 +163,13 @@ export default function () {
                       role: 'tab',
                       class: twMerge(
                         'w-full text-center inline-block px-4 py-2 rounded-full text-gray-700 hover:text-black hover:bg-gray-200 font-medium',
-                        ...(selected === 'btn-workloads'
+                        ...(selectedBtn === 'btn-workloads'
                           ? ['bg-gray-100 text-black']
                           : []),
                       ),
                       disabled,
                       onclick: (e) => {
-                        selected = e.target.id;
+                        selectedBtn = e.target.id;
 
                         listResources = [];
                         selectedResouce = null;
@@ -275,7 +295,7 @@ export default function () {
                               'button',
                               {
                                 class:
-                                  'px-3 text-xs font-medium text-gray-600 hover:text-blue-700 h-10 rounded-full hover:bg-gray-100',
+                                  'px-2 text-xs font-medium text-gray-600 hover:text-blue-700 h-8 rounded-full hover:bg-gray-100',
                                 title: 'Go back',
                                 onclick: () => {
                                   selectedResouce = null;
