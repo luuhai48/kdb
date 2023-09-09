@@ -7,13 +7,16 @@ export default () => ({
    */
   view: (v) =>
     m(
-      'div',
-      { class: 'relative mt-7 inline-block' },
+      'fieldset',
+      { class: 'inline-block border border-gray-200 rounded-lg' },
+
+      v.attrs.label && m('legend', { class: 'text-sm ml-3' }, v.attrs.label),
+
       m(
         'select',
         {
           class: twMerge(
-            'cursor-pointer bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500',
+            'cursor-pointer bg-white text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500',
             v.attrs.class || '',
           ),
           id: v.attrs.id,
@@ -40,14 +43,5 @@ export default () => ({
           ),
         ),
       ),
-
-      v.attrs.label &&
-        m(
-          'label',
-          {
-            class: 'absolute -top-7 left-1',
-          },
-          v.attrs.label,
-        ),
     ),
 });

@@ -27,5 +27,11 @@ declare global {
         ...args: any[]
       ) => Promise<{ err?: Error; data: any }>;
     };
+
+    /**
+     * Send an event to backend and wait for response, but it catches and
+     * show modal automaticly
+     */
+    invoke: (channel: string, ...args: any[]) => Promise<any | undefined>;
   }
 }

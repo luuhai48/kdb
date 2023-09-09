@@ -9,13 +9,6 @@ import NamespaceStream from '../streams/namespace';
 import LoadingStream from '../streams/loading';
 
 export default function () {
-  const showError = (err) => {
-    ModalStream({
-      type: 'error',
-      text: err.message || 'Something went wrong',
-    });
-  };
-
   return {
     /**
      * @param {import('mithril').Vnode} v
@@ -50,7 +43,7 @@ export default function () {
           ),
         ),
 
-        m('div', { class: 'mx-auto p-4' }, [
+        m('div', { class: 'mx-auto px-4 pb-4 pt-8' }, [
           m(Select, {
             options: ClusterStream().contexts,
             selected: ClusterStream().currentContext,
@@ -58,15 +51,11 @@ export default function () {
             onchange: async (e) => {
               LoadingStream(true);
 
-              const { err } = await window.api.invoke(
+              const success = await window.invoke(
                 'k8s.setCurrentContext',
                 e.target.value,
               );
-
-              if (err) {
-                LoadingStream(false);
-                return showError(err);
-              }
+              if (!success) return;
 
               window.reloadConfig();
             },
@@ -84,22 +73,18 @@ export default function () {
               onchange: async (e) => {
                 LoadingStream(true);
 
-                const { err } = await window.api.invoke(
+                const success = await window.invoke(
                   'k8s.setCurrentNamespace',
                   e.target.value,
                 );
-
-                if (err) {
-                  LoadingStream(false);
-                  return showError(err);
-                }
+                if (!success) return;
 
                 window.reloadConfig();
               },
             }),
         ]),
 
-        m('div', { class: 'mx-auto p-4' }, [
+        m('div', { class: 'mx-auto px-4 py-6' }, [
           m(
             'div',
             {

@@ -1,4 +1,5 @@
 import { contextBridge, ipcRenderer } from 'electron';
+import { BadRequest } from './errors';
 
 const whitelistListenChannels = ['err'];
 const whitelistSendChannels = [];
@@ -10,6 +11,8 @@ const whitelistInvokeChannels = [
   'k8s.setCurrentNamespace',
   'k8s.getSecrets',
   'k8s.readSecret',
+  'k8s.getPods',
+  'k8s.readPod',
 ];
 
 contextBridge.exposeInMainWorld('api', {
@@ -20,7 +23,7 @@ contextBridge.exposeInMainWorld('api', {
    */
   on: (channel, listener) => {
     if (!whitelistListenChannels.includes(channel))
-      throw new Error(`Listening on channel "${channel}" is not allowed.`);
+      throw new BadRequest(`Listening on channel "${channel}" is not allowed.`);
 
     ipcRenderer.on(channel, listener);
   },
@@ -32,7 +35,9 @@ contextBridge.exposeInMainWorld('api', {
    */
   send: (channel, ...args) => {
     if (!whitelistSendChannels.includes(channel))
-      throw new Error(`Sending event to channel "${channel}" is not allowed.`);
+      throw new BadRequest(
+        `Sending event to channel "${channel}" is not allowed.`,
+      );
 
     ipcRenderer.send(channel, ...args);
   },
@@ -44,7 +49,7 @@ contextBridge.exposeInMainWorld('api', {
    */
   invoke: (channel, ...args) => {
     if (!whitelistInvokeChannels.includes(channel))
-      throw new Error(`Invoke channel "${channel}" is not allowed.`);
+      throw new BadRequest(`Invoke channel "${channel}" is not allowed.`);
 
     return ipcRenderer.invoke(channel, ...args);
   },

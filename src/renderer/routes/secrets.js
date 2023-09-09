@@ -20,31 +20,6 @@ export default function () {
   let selectedResouce;
   let search;
 
-  ClusterStream.map(() => {
-    disabled = false;
-    listResources = [];
-    selectedResouce = null;
-    search = null;
-
-    m.redraw();
-  });
-
-  NamespaceStream.map(() => {
-    disabled = false;
-    listResources = [];
-    selectedResouce = null;
-    search = null;
-
-    m.redraw();
-  });
-
-  const showError = (err) => {
-    ModalStream({
-      type: 'error',
-      text: err.message || 'Something went wrong',
-    });
-  };
-
   const oninit = async () => {
     await new Promise((resolve) => {
       NamespaceStream.map((ns) => {
@@ -56,20 +31,42 @@ export default function () {
 
     disabled = true;
 
-    const { err, data } = await window.api.invoke(
+    const data = await window.invoke(
       'k8s.getSecrets',
       ClusterStream().currentNamespace,
     );
 
     disabled = false;
-    if (err) {
+    if (!data) {
       m.redraw();
-      return showError(err);
+      return;
     }
 
     listResources = data;
     m.redraw();
   };
+
+  ClusterStream.map((c) => {
+    disabled = false;
+    listResources = [];
+    selectedResouce = null;
+    search = null;
+
+    m.redraw();
+
+    if (c?.currentNamespace) {
+      oninit();
+    }
+  });
+
+  NamespaceStream.map(() => {
+    disabled = false;
+    listResources = [];
+    selectedResouce = null;
+    search = null;
+
+    m.redraw();
+  });
 
   return {
     oninit,
@@ -172,16 +169,16 @@ export default function () {
 
                               disabled = true;
 
-                              const { err, data } = await window.api.invoke(
+                              const data = await window.invoke(
                                 'k8s.readSecret',
                                 s.name,
-                                ClusterStream().currentNamespace || 'default',
+                                ClusterStream().currentNamespace,
                               );
 
                               disabled = false;
-                              if (err) {
+                              if (!data) {
                                 m.redraw();
-                                return showError(err);
+                                return;
                               }
 
                               selectedResouce = data;
@@ -193,23 +190,23 @@ export default function () {
                               'th',
                               {
                                 class:
-                                  'px-6 py-4 font-bold text-gray-900 whitespace-nowrap',
+                                  'px-6 py-4 font-medium text-gray-900 whitespace-nowrap',
                                 scope: 'row',
                               },
                               s.name,
                             ),
                             m(
-                              'th',
+                              'td',
                               { class: 'px-6 py-4', scope: 'row' },
                               s.type,
                             ),
                             m(
-                              'th',
+                              'td',
                               { class: 'px-6 py-4', scope: 'row' },
                               s.data,
                             ),
                             m(
-                              'th',
+                              'td',
                               { class: 'px-6 py-4', scope: 'row' },
                               window.utils.forHumans(
                                 Date.now() -
@@ -217,7 +214,7 @@ export default function () {
                               ),
                             ),
                             m(
-                              'th',
+                              'td',
                               { class: 'px-6 py-4', scope: 'row' },
                               s.lastUpdatedTimestamp
                                 ? window.utils.forHumans(
@@ -279,23 +276,13 @@ export default function () {
                     text: 'Raw value',
                     onclick: () => {
                       const content = { ...selectedResouce };
-                      delete content['metadata']['managedFields'];
-                      const doc = new yaml.Document();
-                      doc.contents = content;
+                      delete content['metadata']?.['managedFields'];
+                      const doc = new yaml.Document(content);
 
                       ModalStream({
                         fullWidth: true,
                         code: doc.toString(),
                         codeLanguage: 'yaml',
-                        buttons: [
-                          m(Button, {
-                            type: 'copy',
-                            text: 'Copy',
-                            onclick: () => {
-                              navigator.clipboard.writeText(doc.toString());
-                            },
-                          }),
-                        ],
                       });
                     },
                   }),
@@ -319,12 +306,13 @@ export default function () {
               m(
                 'div',
                 {
-                  class: 'border border-gray-200 rounded-lg',
+                  class: 'relative',
                 },
                 m(
                   'pre',
                   {
-                    class: 'w-full text-left p-2 overflow-auto text-sm',
+                    class:
+                      'w-full text-left p-2 overflow-auto text-sm border border-gray-200 rounded-lg',
                   },
                   m.trust(
                     hljs.highlight(

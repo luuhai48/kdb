@@ -2,7 +2,7 @@ import m from 'mithril';
 import { twMerge } from 'tailwind-merge';
 
 const defaultClasses =
-  'select-none text-white font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 active:bg-blue-600';
+  'select-none text-white text-sm rounded-lg py-2 px-3 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 active:bg-blue-600';
 
 const pillClasses = 'rounded-full';
 
@@ -20,9 +20,9 @@ const classes = {
     defaultClasses,
     'bg-yellow-400 hover:bg-yellow-500 focus:ring-yellow-300 active:bg-yello-600',
   ),
-  copy: 'inline-flex items-center px-3 py-2 text-xs text-gray-600 hover:text-blue-700 border rounded-lg active:bg-gray-200',
+  copy: 'text-sm inline-flex items-center px-3 py-2 text-gray-600 hover:text-blue-700 border rounded-lg active:bg-gray-200',
   noBorder:
-    'inline-flex p-2 text-xs font-medium text-gray-600 hover:text-blue-700 rounded-lg hover:bg-gray-100 active:bg-gray-200',
+    'text-sm inline-flex p-2 text-gray-600 hover:text-blue-700 rounded-lg hover:bg-gray-100 active:bg-gray-200',
 };
 
 export default function () {

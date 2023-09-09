@@ -4,6 +4,8 @@ import hljs from 'highlight.js';
 
 import ModalStream from '../streams/modal';
 
+import Button from './button';
+
 import CloseIcon from '../icons/close';
 
 export default function () {
@@ -26,7 +28,7 @@ export default function () {
           'div',
           {
             class: twMerge(
-              'relative max-h-full',
+              'relative max-h-full min-w-[25rem]',
               v.attrs.fullWidth ? 'w-full' : 'max-w-md',
             ),
           },
@@ -53,7 +55,7 @@ export default function () {
               { class: 'p-6 text-center' },
 
               v.attrs.type === 'error' &&
-                m.trust(`<svg class="mx-auto mb-4 text-gray-400 w-12 h-12" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                m.trust(`<svg class="mx-auto mb-4 text-red-400 w-12 h-12" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
                   <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 11V6m0 8h.01M19 10a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
                 </svg>`),
 
@@ -61,7 +63,7 @@ export default function () {
                 m(
                   'h3',
                   {
-                    class: 'mb-5 text-lg font-normal text-gray-500',
+                    class: 'text-lg font-normal text-gray-500',
                   },
                   v.attrs.text,
                 ),
@@ -69,7 +71,7 @@ export default function () {
               v.attrs.code &&
                 m(
                   'div',
-                  { class: 'border border-gray-200 mb-3 rounded-lg' },
+                  { class: 'border border-gray-200 mb-3 rounded-lg mt-6' },
                   m(
                     'pre',
                     {
@@ -83,7 +85,22 @@ export default function () {
                   ),
                 ),
 
-              ...(v.attrs?.buttons || []),
+              (v.attrs.buttons?.length > 0 || v.attrs.code) &&
+                m(
+                  'div',
+                  {
+                    class: 'flex items-center justify-center',
+                  },
+                  v.attrs.code &&
+                    m(Button, {
+                      type: 'copy',
+                      text: 'Copy',
+                      onclick: () => {
+                        navigator.clipboard.writeText(v.attrs.code);
+                      },
+                    }),
+                  v.attrs?.buttons,
+                ),
             ),
           ),
         ),

@@ -1,3 +1,10 @@
+import m from 'mithril';
+
+import ModalStream from './streams/modal';
+import LoadingStream from './streams/loading';
+
+import Button from './components/button';
+
 window.utils = {
   /**
    * Translates milliseconds into human readable format of seconds, minutes, hours, days, and years
@@ -29,4 +36,33 @@ window.utils = {
     }
     return 'Just now';
   },
+};
+
+window.invoke = async (channel, ...args) => {
+  const result = await window.api.invoke(channel, ...args);
+
+  if (!(result instanceof Object && 'error' in result)) {
+    return result;
+  }
+
+  const modalData = {
+    type: 'error',
+    text: result.error,
+  };
+  if (!result.code || result.code === 500) {
+    modalData.closeable = false;
+    modalData.buttons = [
+      m(Button, {
+        type: 'error',
+        text: 'Try again',
+        onclick: () => {
+          LoadingStream(false);
+          ModalStream(false);
+          window.reloadConfig();
+        },
+      }),
+    ];
+  }
+
+  ModalStream(modalData);
 };

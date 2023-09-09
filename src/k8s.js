@@ -1,4 +1,4 @@
-import { KubeConfig, CoreV1Api } from '@kubernetes/client-node';
+import { KubeConfig, CoreV1Api, AppsV1Api } from '@kubernetes/client-node';
 import { exec } from './shell';
 
 /** @type {KubeConfig} */
@@ -6,6 +6,9 @@ let config;
 
 /** @type {CoreV1Api} */
 let api;
+
+/** @type {AppsV1Api} */
+let appsApi;
 
 export default {
   /**
@@ -37,6 +40,7 @@ export default {
 
     try {
       api = config.makeApiClient(CoreV1Api);
+      appsApi = config.makeApiClient(AppsV1Api);
     } catch (e) {
       return e;
     }
@@ -72,5 +76,9 @@ export default {
 
   get api() {
     return api;
+  },
+
+  get appsApi() {
+    return appsApi;
   },
 };
