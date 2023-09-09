@@ -1,7 +1,8 @@
 /// <reference path="types.d.ts"/>
 
 import m from 'mithril';
-import 'highlight.js/styles/atom-one-light.css';
+
+import './utils';
 
 import Layout from './components/layout';
 import Button from './components/button';

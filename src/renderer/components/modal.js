@@ -4,6 +4,8 @@ import hljs from 'highlight.js';
 
 import ModalStream from '../streams/modal';
 
+import CloseIcon from '../icons/close';
+
 export default function () {
   return {
     /**
@@ -16,6 +18,9 @@ export default function () {
           tabindex: -1,
           class:
             'fixed top-0 left-0 right-0 z-50 p-4 overflow-x-hidden overflow-y-auto md:inset-0 max-h-full bg-gray-600 bg-opacity-90 flex justify-center items-center',
+          onclick: (e) => {
+            if (e.target.classList.contains('modal')) ModalStream(false);
+          },
         },
         m(
           'div',
@@ -39,9 +44,7 @@ export default function () {
                     ModalStream(false);
                   },
                 },
-                m.trust(`<svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
-    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
-  </svg>`),
+                m(CloseIcon),
                 m('span', { class: 'sr-only' }, 'Close'),
               ),
 
@@ -66,7 +69,7 @@ export default function () {
               v.attrs.code &&
                 m(
                   'div',
-                  { class: 'border border-gray-200 mb-3' },
+                  { class: 'border border-gray-200 mb-3 rounded-lg' },
                   m(
                     'pre',
                     {

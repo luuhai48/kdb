@@ -78,7 +78,19 @@ export default (args) => {
         .then((r) => r.body.items);
 
       return {
-        data: data.map((s) => s.metadata.name),
+        data: data.map((s) => ({
+          name: s.metadata.name,
+          type: s.type,
+          data: Object.keys(s.data || {}).length || 0,
+          creationTimestamp: s.metadata.creationTimestamp,
+          lastUpdatedTimestamp:
+            s.metadata.managedFields?.length > 1 &&
+            s.metadata.managedFields[s.metadata.managedFields.length - 1]
+              .time !== s.metadata.creationTimestamp
+              ? s.metadata.managedFields[s.metadata.managedFields.length - 1]
+                  .time
+              : undefined,
+        })),
       };
     } catch (err) {
       return { err };

@@ -10,6 +10,10 @@ import ClusterStream from '../streams/cluster';
 import NamespaceStream from '../streams/namespace';
 import ModalStream from '../streams/modal';
 
+import SearchIcon from '../icons/search';
+import ReloadIcon from '../icons/reload';
+import BackIcon from '../icons/back';
+
 export default function () {
   let disabled = false;
   let listResources = [];
@@ -86,9 +90,9 @@ export default function () {
                 class:
                   'absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none',
               },
-              m.trust(`<svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
-              </svg>`),
+              m(SearchIcon, {
+                class: 'text-gray-500 dark:text-gray-400',
+              }),
             ),
             m('input', {
               type: 'search',
@@ -108,16 +112,14 @@ export default function () {
               {
                 type: 'noBorder',
                 pill: true,
-                class: 'ml-2',
+                class: 'ml-2 p-3',
                 title: 'Reload',
                 disabled,
                 onclick: () => {
                   oninit();
                 },
               },
-              m.trust(`<svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 20">
-              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 1v5h-5M2 19v-5h5m10-4a8 8 0 0 1-14.947 3.97M1 10a8 8 0 0 1 14.947-3.97"/>
-            </svg>`),
+              m(ReloadIcon),
             ),
           ]),
 
@@ -126,41 +128,111 @@ export default function () {
             : listResources.length === 0
             ? m('h3', { class: 'mt-4' }, 'No resource found')
             : m(
-                'ul',
-                { class: 'mt-5' },
-                (search
-                  ? listResources.filter((n) => n.includes(search))
-                  : listResources
-                ).map((name) =>
-                  m(
-                    'li',
+                'div',
+                {
+                  class: 'relative overflow-x-auto mt-2',
+                },
+                m(
+                  'table',
+                  { class: 'w-full text-sm text-left text-gray-500' },
+                  [
                     m(
-                      'button',
+                      'thead',
                       {
-                        class: 'hover:underline',
-                        disabled,
-                        onclick: async () => {
-                          disabled = true;
-
-                          const { err, data } = await window.api.invoke(
-                            'k8s.readSecret',
-                            name,
-                            ClusterStream().currentNamespace || 'default',
-                          );
-
-                          disabled = false;
-                          if (err) {
-                            m.redraw();
-                            return showError(err);
-                          }
-
-                          selectedResouce = data;
-                          m.redraw();
-                        },
+                        class: 'text-xs text-gray-700 uppercase bg-gray-50">',
                       },
-                      name,
+                      [
+                        m('tr', [
+                          m('th', { class: 'px-6 py-3', scope: 'col' }, 'NAME'),
+                          m('th', { class: 'px-6 py-3', scope: 'col' }, 'TYPE'),
+                          m('th', { class: 'px-6 py-3', scope: 'col' }, 'DATA'),
+                          m('th', { class: 'px-6 py-3', scope: 'col' }, 'AGE'),
+                          m(
+                            'th',
+                            { class: 'px-6 py-3', scope: 'col' },
+                            'LAST UPDATE',
+                          ),
+                        ]),
+                      ],
                     ),
-                  ),
+
+                    m(
+                      'tbody',
+                      (search
+                        ? listResources.filter((s) => s.name.includes(search))
+                        : listResources
+                      ).map((s) =>
+                        m(
+                          'tr',
+                          {
+                            class:
+                              'bg-white border-b hover:bg-gray-50 cursor-pointer',
+                            onclick: async () => {
+                              if (disabled) return;
+
+                              disabled = true;
+
+                              const { err, data } = await window.api.invoke(
+                                'k8s.readSecret',
+                                s.name,
+                                ClusterStream().currentNamespace || 'default',
+                              );
+
+                              disabled = false;
+                              if (err) {
+                                m.redraw();
+                                return showError(err);
+                              }
+
+                              selectedResouce = data;
+                              m.redraw();
+                            },
+                          },
+                          [
+                            m(
+                              'th',
+                              {
+                                class:
+                                  'px-6 py-4 font-bold text-gray-900 whitespace-nowrap',
+                                scope: 'row',
+                              },
+                              s.name,
+                            ),
+                            m(
+                              'th',
+                              { class: 'px-6 py-4', scope: 'row' },
+                              s.type,
+                            ),
+                            m(
+                              'th',
+                              { class: 'px-6 py-4', scope: 'row' },
+                              s.data,
+                            ),
+                            m(
+                              'th',
+                              { class: 'px-6 py-4', scope: 'row' },
+                              window.utils.forHumans(
+                                Date.now() -
+                                  new Date(s.creationTimestamp).getTime(),
+                              ),
+                            ),
+                            m(
+                              'th',
+                              { class: 'px-6 py-4', scope: 'row' },
+                              s.lastUpdatedTimestamp
+                                ? window.utils.forHumans(
+                                    Date.now() -
+                                      new Date(
+                                        s.lastUpdatedTimestamp,
+                                      ).getTime(),
+                                  )
+                                : '',
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
         ],
@@ -198,20 +270,18 @@ export default function () {
                         selectedResouce = null;
                       },
                     },
-                    m.trust(`<svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 8 14">
-                      <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 1 1.3 6.326a.91.91 0 0 0 0 1.348L7 13"></path>
-                    </svg>`),
+                    m(BackIcon),
                   ),
 
                   m(Button, {
                     type: 'noBorder',
                     class: 'h-8 ml-auto',
-                    pill: true,
                     text: 'Raw value',
                     onclick: () => {
+                      const content = { ...selectedResouce };
+                      delete content['metadata']['managedFields'];
                       const doc = new yaml.Document();
-                      delete selectedResouce['metadata']['managedFields'];
-                      doc.contents = selectedResouce;
+                      doc.contents = content;
 
                       ModalStream({
                         fullWidth: true,
@@ -234,7 +304,6 @@ export default function () {
                     type: 'copy',
                     text: 'Copy',
                     class: 'h-8 ml-2',
-                    pill: true,
                     onclick: () => {
                       const parsedSecrets = Object.entries(selectedResouce.data)
                         .map(([key, val]) => `${key}=${atob(val)}`)
@@ -250,7 +319,7 @@ export default function () {
               m(
                 'div',
                 {
-                  class: 'border border-gray-200',
+                  class: 'border border-gray-200 rounded-lg',
                 },
                 m(
                   'pre',
