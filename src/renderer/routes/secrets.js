@@ -42,6 +42,14 @@ export default function () {
   };
 
   const oninit = async () => {
+    await new Promise((resolve) => {
+      NamespaceStream.map((ns) => {
+        if (ns.length > 0) {
+          resolve();
+        }
+      });
+    });
+
     disabled = true;
 
     const { err, data } = await window.api.invoke(
@@ -84,7 +92,6 @@ export default function () {
             ),
             m('input', {
               type: 'search',
-              id: 'resource-search',
               placeholder: 'Search resouce...',
               class:
                 'block p-2 pl-8 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500',
@@ -178,8 +185,7 @@ export default function () {
               m(
                 'div',
                 {
-                  class:
-                    'absolute -top-[2.5rem] left-0 flex w-full items-center',
+                  class: 'absolute -top-10 left-0 flex w-full items-center',
                 },
                 [
                   m(
