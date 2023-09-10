@@ -7,6 +7,7 @@ import ModalStream from '../streams/modal';
 import ClusterStream from '../streams/cluster';
 import NamespaceStream from '../streams/namespace';
 import LoadingStream from '../streams/loading';
+import AppStream from '../streams/app';
 
 export default function () {
   return {
@@ -40,6 +41,10 @@ export default function () {
                 'KDB',
               ),
             ),
+
+            m('div', { class: 'hidden w-full md:block md:w-auto' }, [
+              `Version: ${AppStream().version}`,
+            ]),
           ),
         ),
 

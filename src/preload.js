@@ -15,6 +15,10 @@ const whitelistInvokeChannels = [
   'k8s.readPod',
 ];
 
+contextBridge.exposeInMainWorld('app', {
+  version: () => ipcRenderer.invoke('getVersion'),
+});
+
 contextBridge.exposeInMainWorld('api', {
   /**
    * Listen to events from backend

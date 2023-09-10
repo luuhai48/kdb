@@ -1,4 +1,4 @@
-import { ipcMain } from 'electron';
+import { app, ipcMain } from 'electron';
 
 import k8s from './k8s';
 import { BadRequest, InternalServerError } from './errors';
@@ -8,6 +8,10 @@ import { BadRequest, InternalServerError } from './errors';
  */
 // eslint-disable-next-line no-unused-vars
 export default (args) => {
+  ipcMain.handle('getVersion', () => {
+    return app.getVersion();
+  });
+
   ipcMain.handle('k8s.reloadConfig', async () => {
     const err = await k8s.reloadConfig();
     if (err) {
@@ -41,7 +45,7 @@ export default (args) => {
 
       return data.map((n) => n.metadata.name);
     } catch (err) {
-      throw InternalServerError(err.message);
+      return InternalServerError(err.message);
     }
   });
 
@@ -79,9 +83,8 @@ export default (args) => {
         data: Object.keys(s.data || {}).length,
         creationTimestamp: s.metadata.creationTimestamp,
         lastUpdatedTimestamp:
-          s.metadata.managedFields?.length > 1 &&
           s.metadata.managedFields[s.metadata.managedFields.length - 1].time !==
-            s.metadata.creationTimestamp
+          s.metadata.creationTimestamp
             ? s.metadata.managedFields[s.metadata.managedFields.length - 1].time
             : undefined,
       }));

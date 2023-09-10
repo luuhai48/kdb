@@ -26,10 +26,10 @@ export default {
     if (
       config.contexts.length &&
       config.currentContext &&
-      !config.contexts.find((c) => c.cluster === config.currentContext)
+      !config.contexts.find((c) => c.name === config.currentContext)
     ) {
       const result = await exec(
-        `kubectl config use-context ${config.contexts[0].cluster}`,
+        `kubectl config use-context ${config.contexts[0].name}`,
       );
       if (!result || result.code !== 0) {
         return new Error(result.stderr);

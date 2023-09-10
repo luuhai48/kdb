@@ -46,26 +46,26 @@ export default function () {
     m.redraw();
   };
 
-  ClusterStream.map((c) => {
+  ClusterStream.map(() => {
     disabled = false;
     listResources = [];
     selectedResouce = null;
     search = null;
 
     m.redraw();
-
-    if (c?.currentNamespace) {
-      oninit();
-    }
   });
 
-  NamespaceStream.map(() => {
+  NamespaceStream.map((ns) => {
     disabled = false;
     listResources = [];
     selectedResouce = null;
     search = null;
 
     m.redraw();
+
+    if (ns.length > 0) {
+      oninit();
+    }
   });
 
   return {

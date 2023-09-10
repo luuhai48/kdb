@@ -21,6 +21,7 @@ export default function () {
           class:
             'fixed top-0 left-0 right-0 z-50 p-4 overflow-x-hidden overflow-y-auto md:inset-0 max-h-full bg-gray-600 bg-opacity-90 flex justify-center items-center',
           onclick: (e) => {
+            if (v.attrs?.closeable === false) return;
             if (e.target.classList.contains('modal')) ModalStream(false);
           },
         },

@@ -12,6 +12,7 @@ import Pods from './routes/pods';
 import LoadingStream from './streams/loading';
 import ClusterStream from './streams/cluster';
 import NamespaceStream from './streams/namespace';
+import AppStream from './streams/app';
 
 // =============================================================================
 
@@ -47,7 +48,7 @@ window.reloadConfig = async () => {
   const currentContextObj = contexts.find((c) => c.cluster === currentContext);
 
   ClusterStream({
-    contexts: contexts.map((c) => c.cluster),
+    contexts: contexts.map((c) => c.name),
     currentContext,
     currentNamespace: currentContextObj?.namespace || 'default',
   });
@@ -60,3 +61,7 @@ window.reloadConfig = async () => {
   LoadingStream(false);
 };
 window.reloadConfig();
+
+window.app.version().then((v) => {
+  AppStream({ version: v });
+});

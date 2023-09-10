@@ -2,6 +2,13 @@ import { IpcRendererEvent } from 'electron';
 
 declare global {
   interface Window {
+    app: {
+      /**
+       * Application version. Defined in `package.json`
+       */
+      version: string;
+    };
+
     /**
      * Context bridge to communicate with backend
      */

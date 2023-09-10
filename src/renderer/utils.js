@@ -40,6 +40,7 @@ window.utils = {
 
 window.invoke = async (channel, ...args) => {
   const result = await window.api.invoke(channel, ...args);
+  LoadingStream(false);
 
   if (!(result instanceof Object && 'error' in result)) {
     return result;
@@ -54,9 +55,9 @@ window.invoke = async (channel, ...args) => {
     modalData.buttons = [
       m(Button, {
         type: 'error',
+        class: 'mt-4',
         text: 'Try again',
         onclick: () => {
-          LoadingStream(false);
           ModalStream(false);
           window.reloadConfig();
         },
