@@ -65,6 +65,7 @@ export default function () {
       await oninit();
       pageInit = true;
     },
+
     view: () => [
       m(
         'div',
@@ -151,9 +152,9 @@ export default function () {
                     m(
                       'tbody',
                       (search
-                        ? listResources.filter((s) => s.name.includes(search))
+                        ? listResources.filter((r) => r.name.includes(search))
                         : listResources
-                      ).map((s) =>
+                      ).map((r) =>
                         m(
                           'tr',
                           {
@@ -166,7 +167,7 @@ export default function () {
 
                               const data = await window.invoke(
                                 'k8s.readSecret',
-                                s.name,
+                                r.name,
                                 ClusterStream().currentNamespace,
                               );
 
@@ -188,45 +189,35 @@ export default function () {
                                   'px-6 py-4 font-medium text-gray-900 whitespace-nowrap',
                                 scope: 'row',
                               },
-                              s.name,
+                              r.name,
                             ),
                             m(
                               'td',
                               { class: 'px-6 py-4', scope: 'row' },
-                              s.type,
+                              r.type,
                             ),
                             m(
                               'td',
                               { class: 'px-6 py-4', scope: 'row' },
-                              s.data,
+                              r.data,
                             ),
                             m(
                               'td',
                               {
                                 class: 'px-6 py-4',
                                 scope: 'row',
-                                title: s.creationTimestamp,
+                                title: r.creationTimestamp,
                               },
-                              window.utils.forHumans(
-                                Date.now() -
-                                  new Date(s.creationTimestamp).getTime(),
-                              ),
+                              window.utils.forHumans(r.creationTimestamp),
                             ),
                             m(
                               'td',
                               {
                                 class: 'px-6 py-4',
                                 scope: 'row',
-                                title: s.lastUpdatedTimestamp,
+                                title: r.lastUpdatedTimestamp,
                               },
-                              s.lastUpdatedTimestamp
-                                ? window.utils.forHumans(
-                                    Date.now() -
-                                      new Date(
-                                        s.lastUpdatedTimestamp,
-                                      ).getTime(),
-                                  )
-                                : '',
+                              window.utils.forHumans(r.lastUpdatedTimestamp),
                             ),
                           ],
                         ),

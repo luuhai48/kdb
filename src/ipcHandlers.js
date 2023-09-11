@@ -83,10 +83,7 @@ export default (args) => {
         data: Object.keys(s.data || {}).length,
         creationTimestamp: s.metadata.creationTimestamp,
         lastUpdatedTimestamp:
-          s.metadata.managedFields[s.metadata.managedFields.length - 1].time !==
-          s.metadata.creationTimestamp
-            ? s.metadata.managedFields[s.metadata.managedFields.length - 1].time
-            : undefined,
+          s.metadata.managedFields[s.metadata.managedFields.length - 1].time,
       }));
     } catch (err) {
       return BadRequest(err.message);
@@ -113,7 +110,37 @@ export default (args) => {
     }
 
     try {
-      return await k8s.api.listNamespacedPod(namespace).then((r) => r.body);
+      const data = await k8s.api
+        .listNamespacedPod(namespace)
+        .then((r) => r.body.items);
+
+      return data.map((p) => {
+        const terminatedStates = (p.status?.containerStatuses || []).filter(
+          (s) => s.lastState?.terminated,
+        );
+
+        return {
+          name: p.metadata.name,
+          creationTimestamp: p.metadata.creationTimestamp,
+          lastUpdatedTimestamp:
+            p.metadata.managedFields[p.metadata.managedFields.length - 1].time,
+          status: p.metadata.deletionTimestamp ? 'Terminating' : p.status.phase,
+          ready: `${p.status?.containerStatuses?.length}/${
+            (p.status?.containerStatuses || []).filter((s) => s.ready).length
+          }`,
+          restarts: (p.status?.containerStatuses || []).reduce(
+            (result, cur) => {
+              return result + cur.restartCount;
+            },
+            0,
+          ),
+          terminaltedTimestamp:
+            terminatedStates?.length > 0
+              ? terminatedStates[terminatedStates.length - 1].lastState
+                  .terminated.finishedAt
+              : undefined,
+        };
+      });
     } catch (err) {
       return BadRequest(err.message);
     }

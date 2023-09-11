@@ -13,6 +13,22 @@ window.utils = {
    * @return {string} The phrase describing the amount of time
    */
   forHumans(milliseconds) {
+    if (milliseconds === undefined || milliseconds === null) return '';
+
+    if (typeof milliseconds === 'string') {
+      try {
+        milliseconds = Date.parse(milliseconds);
+      } catch {
+        return '';
+      }
+    }
+
+    if (milliseconds instanceof Date) {
+      milliseconds = milliseconds.getTime();
+    }
+
+    milliseconds = Date.now() - milliseconds;
+
     let temp = Math.floor(milliseconds / 1000);
     const years = Math.floor(temp / 31536000);
     if (years) {
