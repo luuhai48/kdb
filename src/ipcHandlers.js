@@ -8,7 +8,7 @@ import { BadRequest, InternalServerError } from './errors';
  */
 // eslint-disable-next-line no-unused-vars
 export default (args) => {
-  ipcMain.handle('getVersion', () => {
+  ipcMain.handle('app.getVersion', () => {
     return app.getVersion();
   });
 

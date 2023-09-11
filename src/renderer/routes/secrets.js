@@ -15,9 +15,9 @@ import ReloadIcon from '../icons/reload';
 import BackIcon from '../icons/back';
 
 export default function () {
-  let disabled = false;
+  let disabled = true;
   let listResources = [];
-  let selectedResouce;
+  let selectedResource;
   let search;
   let pageInit = false;
 
@@ -48,9 +48,9 @@ export default function () {
   };
 
   NamespaceStream.map((ns) => {
-    disabled = false;
+    disabled = true;
     listResources = [];
-    selectedResouce = null;
+    selectedResource = null;
     search = null;
 
     m.redraw();
@@ -72,7 +72,7 @@ export default function () {
         {
           class: twMerge(
             'px-6 w-full flex-[0_0_auto] transition-all',
-            ...(selectedResouce ? ['-translate-x-full'] : ['translate-x-0']),
+            ...(selectedResource ? ['-translate-x-full'] : ['translate-x-0']),
           ),
         },
         [
@@ -177,7 +177,7 @@ export default function () {
                                 return;
                               }
 
-                              selectedResouce = data;
+                              selectedResource = data;
                               m.redraw();
                             },
                           },
@@ -234,7 +234,7 @@ export default function () {
         {
           class: twMerge(
             'w-full flex-[0_0_auto] transition-all',
-            ...(selectedResouce ? ['-translate-x-full'] : ['translate-x-0']),
+            ...(selectedResource ? ['-translate-x-full'] : ['translate-x-0']),
           ),
         },
         [
@@ -244,7 +244,7 @@ export default function () {
               class: 'whitespace-pre leading-6 ml-6 relative mt-10',
             },
 
-            selectedResouce &&
+            selectedResource &&
               m(
                 'div',
                 {
@@ -258,10 +258,16 @@ export default function () {
                       type: 'noBorder',
                       pill: true,
                       onclick: () => {
-                        selectedResouce = null;
+                        selectedResource = null;
                       },
                     },
                     m(BackIcon),
+                  ),
+
+                  m(
+                    'h1',
+                    { class: 'ml-4' },
+                    `Secret: ${selectedResource.metadata.name}`,
                   ),
 
                   m(Button, {
@@ -269,7 +275,7 @@ export default function () {
                     class: 'h-8 ml-auto',
                     text: 'Raw value',
                     onclick: () => {
-                      const content = { ...selectedResouce };
+                      const content = { ...selectedResource };
                       delete content['metadata']?.['managedFields'];
                       const doc = new yaml.Document(content);
 
@@ -286,7 +292,9 @@ export default function () {
                     text: 'Copy',
                     class: 'h-8 ml-2',
                     onclick: () => {
-                      const parsedSecrets = Object.entries(selectedResouce.data)
+                      const parsedSecrets = Object.entries(
+                        selectedResource.data,
+                      )
                         .map(([key, val]) => `${key}=${atob(val)}`)
                         .join('\n');
 
@@ -296,7 +304,7 @@ export default function () {
                 ],
               ),
 
-            selectedResouce &&
+            selectedResource &&
               m(
                 'div',
                 {
@@ -310,7 +318,7 @@ export default function () {
                   },
                   m.trust(
                     hljs.highlight(
-                      Object.entries(selectedResouce.data)
+                      Object.entries(selectedResource.data)
                         .map(([key, val]) => `${key}=${atob(val)}`)
                         .join('\n'),
                       { language: 'properties' },

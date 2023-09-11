@@ -16,7 +16,7 @@ const whitelistInvokeChannels = [
 ];
 
 contextBridge.exposeInMainWorld('app', {
-  version: () => ipcRenderer.invoke('getVersion'),
+  version: () => ipcRenderer.invoke('app.getVersion'),
 });
 
 contextBridge.exposeInMainWorld('api', {
