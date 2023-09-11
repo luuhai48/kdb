@@ -44,7 +44,7 @@ export default {
     try {
       api = config.makeApiClient(CoreV1Api);
       appsApi = config.makeApiClient(AppsV1Api);
-      log = Log(config);
+      log = new Log(config);
     } catch (e) {
       return e;
     }

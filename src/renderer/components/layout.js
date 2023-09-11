@@ -100,7 +100,7 @@ export default function () {
                 'ul',
                 {
                   class:
-                    'flex flex-col -mb-px text-sm font-medium text-center border-r w-40 pr-6',
+                    'flex flex-col -mb-px text-sm font-medium text-center border-r w-60 pr-6',
                 },
                 [
                   m(
@@ -112,7 +112,7 @@ export default function () {
                         type: 'button',
                         role: 'tab',
                         class: twMerge(
-                          'w-full text-center inline-block px-4 py-2 rounded-lg text-gray-700 hover:text-black hover:bg-gray-200 font-medium',
+                          'w-full text-center inline-block p-2 rounded-lg text-gray-700 hover:text-black hover:bg-gray-200 font-medium',
                           ...(m.route.get() === '/secrets'
                             ? ['bg-gray-100 text-black']
                             : []),
@@ -135,7 +135,7 @@ export default function () {
                         type: 'button',
                         role: 'tab',
                         class: twMerge(
-                          'w-full text-center inline-block px-4 py-2 rounded-lg text-gray-700 hover:text-black hover:bg-gray-200 font-medium',
+                          'w-full text-center inline-block p-2 rounded-lg text-gray-700 hover:text-black hover:bg-gray-200 font-medium',
                           ...(m.route.get() === '/pods'
                             ? ['bg-gray-100 text-black']
                             : []),

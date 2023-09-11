@@ -47,6 +47,27 @@ export default function () {
     m.redraw();
   };
 
+  const selectResource = (resourceName) => async () => {
+    if (disabled) return;
+
+    disabled = true;
+
+    const data = await window.invoke(
+      'k8s.readSecret',
+      resourceName,
+      ClusterStream().currentNamespace,
+    );
+
+    disabled = false;
+    if (!data) {
+      m.redraw();
+      return;
+    }
+
+    selectedResource = data;
+    m.redraw();
+  };
+
   NamespaceStream.map((ns) => {
     disabled = true;
     listResources = [];
@@ -160,26 +181,7 @@ export default function () {
                           {
                             class:
                               'bg-white border-b hover:bg-gray-50 cursor-pointer',
-                            onclick: async () => {
-                              if (disabled) return;
-
-                              disabled = true;
-
-                              const data = await window.invoke(
-                                'k8s.readSecret',
-                                r.name,
-                                ClusterStream().currentNamespace,
-                              );
-
-                              disabled = false;
-                              if (!data) {
-                                m.redraw();
-                                return;
-                              }
-
-                              selectedResource = data;
-                              m.redraw();
-                            },
+                            onclick: selectResource(r.name),
                           },
                           [
                             m(
@@ -268,6 +270,19 @@ export default function () {
                     'h1',
                     { class: 'ml-4' },
                     `Secret: ${selectedResource.metadata.name}`,
+                  ),
+
+                  m(
+                    Button,
+                    {
+                      type: 'noBorder',
+                      pill: true,
+                      class: 'ml-2 p-3',
+                      title: 'Reload',
+                      disabled,
+                      onclick: selectResource(selectedResource.metadata.name),
+                    },
+                    m(ReloadIcon),
                   ),
 
                   m(Button, {
