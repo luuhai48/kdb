@@ -1,7 +1,7 @@
 import { contextBridge, ipcRenderer } from 'electron';
 import { BadRequest } from './errors';
 
-const whitelistListenChannels = ['err'];
+const whitelistListenChannels = ['k8s.watchPodLogs'];
 const whitelistSendChannels = [];
 const whitelistInvokeChannels = [
   'k8s.reloadConfig',
@@ -13,6 +13,7 @@ const whitelistInvokeChannels = [
   'k8s.readSecret',
   'k8s.getPods',
   'k8s.readPod',
+  'k8s.watchPodLogs',
 ];
 
 contextBridge.exposeInMainWorld('app', {
@@ -30,6 +31,15 @@ contextBridge.exposeInMainWorld('api', {
       throw new BadRequest(`Listening on channel "${channel}" is not allowed.`);
 
     ipcRenderer.on(channel, listener);
+  },
+
+  /**
+   * Listen to events from backend
+   * @param {string} channel
+   * @param {(event: import('electron').IpcRendererEvent, ...args: any[]) => void} listener
+   */
+  off: (channel, listener) => {
+    ipcRenderer.off(channel, listener);
   },
 
   /**

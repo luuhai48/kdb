@@ -1,12 +1,12 @@
+const stream = require('stream');
 import { app, ipcMain } from 'electron';
 
 import k8s from './k8s';
 import { BadRequest, InternalServerError } from './errors';
 
 /**
- * @param {{window:import('electron').BrowserWindow}}
+ * @param {{window: import('electron').BrowserWindow}} args
  */
-// eslint-disable-next-line no-unused-vars
 export default (args) => {
   ipcMain.handle('app.getVersion', () => {
     return app.getVersion();
@@ -25,7 +25,7 @@ export default (args) => {
   });
 
   ipcMain.handle('k8s.getClusters', async () => {
-    if (!k8s.config || !k8s.api || !k8s.appsApi) {
+    if (!k8s.config || !k8s.api || !k8s.appsApi || !k8s.log) {
       return InternalServerError('Invalid kube config');
     }
 
@@ -36,7 +36,7 @@ export default (args) => {
   });
 
   ipcMain.handle('k8s.getNamespaces', async () => {
-    if (!k8s.config || !k8s.api || !k8s.appsApi) {
+    if (!k8s.config || !k8s.api || !k8s.appsApi || !k8s.log) {
       return InternalServerError('Invalid kube config');
     }
 
@@ -64,11 +64,11 @@ export default (args) => {
       return BadRequest(err.message);
     }
 
-    return { data: true };
+    return true;
   });
 
   ipcMain.handle('k8s.getSecrets', async (_, namespace) => {
-    if (!k8s.config || !k8s.api || !k8s.appsApi) {
+    if (!k8s.config || !k8s.api || !k8s.appsApi || !k8s.log) {
       return InternalServerError('Invalid kube config');
     }
 
@@ -91,7 +91,7 @@ export default (args) => {
   });
 
   ipcMain.handle('k8s.readSecret', async (_, secretName, namespace) => {
-    if (!k8s.config || !k8s.api || !k8s.appsApi) {
+    if (!k8s.config || !k8s.api || !k8s.appsApi || !k8s.log) {
       return InternalServerError('Invalid kube config');
     }
 
@@ -105,7 +105,7 @@ export default (args) => {
   });
 
   ipcMain.handle('k8s.getPods', async (_, namespace) => {
-    if (!k8s.config || !k8s.api || !k8s.appsApi) {
+    if (!k8s.config || !k8s.api || !k8s.appsApi || !k8s.log) {
       return InternalServerError('Invalid kube config');
     }
 
@@ -147,7 +147,7 @@ export default (args) => {
   });
 
   ipcMain.handle('k8s.readPod', async (_, podName, namespace) => {
-    if (!k8s.config || !k8s.api || !k8s.appsApi) {
+    if (!k8s.config || !k8s.api || !k8s.appsApi || !k8s.log) {
       return InternalServerError('Invalid kube config');
     }
 
@@ -155,6 +155,28 @@ export default (args) => {
       return await k8s.api
         .readNamespacedPod(podName, namespace)
         .then((r) => r.body);
+    } catch (err) {
+      return BadRequest(err.message);
+    }
+  });
+
+  ipcMain.handle('k8s.watchPodLogs', async (_, podName, namespace) => {
+    if (!k8s.config || !k8s.api || !k8s.appsApi || !k8s.log) {
+      return InternalServerError('Invalid kube config');
+    }
+
+    try {
+      const logStream = new stream.PassThrough();
+      logStream.on('data', (chunk) => {
+        args.window.webContents.send('k8s.watchPodLogs', chunk);
+      });
+
+      const req = await k8s.log.log(namespace, podName, undefined, logStream, {
+        follow: true,
+        tailLines: 50,
+        pretty: true,
+        timestamps: true,
+      });
     } catch (err) {
       return BadRequest(err.message);
     }
