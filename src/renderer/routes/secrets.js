@@ -19,6 +19,7 @@ export default function () {
   let listResources = [];
   let selectedResouce;
   let search;
+  let pageInit = false;
 
   const oninit = async () => {
     await new Promise((resolve) => {
@@ -46,15 +47,6 @@ export default function () {
     m.redraw();
   };
 
-  ClusterStream.map(() => {
-    disabled = false;
-    listResources = [];
-    selectedResouce = null;
-    search = null;
-
-    m.redraw();
-  });
-
   NamespaceStream.map((ns) => {
     disabled = false;
     listResources = [];
@@ -63,13 +55,16 @@ export default function () {
 
     m.redraw();
 
-    if (ns.length > 0) {
+    if (pageInit && ns.length > 0) {
       oninit();
     }
   });
 
   return {
-    oninit,
+    oninit: async () => {
+      await oninit();
+      pageInit = true;
+    },
     view: () => [
       m(
         'div',
@@ -207,7 +202,11 @@ export default function () {
                             ),
                             m(
                               'td',
-                              { class: 'px-6 py-4', scope: 'row' },
+                              {
+                                class: 'px-6 py-4',
+                                scope: 'row',
+                                title: s.creationTimestamp,
+                              },
                               window.utils.forHumans(
                                 Date.now() -
                                   new Date(s.creationTimestamp).getTime(),
@@ -215,7 +214,11 @@ export default function () {
                             ),
                             m(
                               'td',
-                              { class: 'px-6 py-4', scope: 'row' },
+                              {
+                                class: 'px-6 py-4',
+                                scope: 'row',
+                                title: s.lastUpdatedTimestamp,
+                              },
                               s.lastUpdatedTimestamp
                                 ? window.utils.forHumans(
                                     Date.now() -

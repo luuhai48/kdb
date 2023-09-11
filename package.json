@@ -12,9 +12,10 @@
     "lint": "echo \"No linting configured\""
   },
   "keywords": [
-    "Dashboard",
+    "dashboard",
     "kubernetes",
-    "k8s"
+    "k8s",
+    "development"
   ],
   "author": {
     "name": "luuhai48",
