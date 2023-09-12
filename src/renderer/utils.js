@@ -1,4 +1,5 @@
 import m from 'mithril';
+import hljs from 'highlight.js';
 
 import ModalStream from './streams/modal';
 import LoadingStream from './streams/loading';
@@ -7,9 +8,9 @@ import Button from './components/button';
 
 window.utils = {
   /**
-   * Translates milliseconds into human readable format of seconds, minutes, hours, days, and years
+   * Translates time into human readable format of seconds, minutes, hours, days, and years
    *
-   * @param  {number} milliseconds The number of seconds to be processed
+   * @param  {number|string|Date} milliseconds The number of milliseconds in number or string, or a Date
    * @return {string} The phrase describing the amount of time
    */
   forHumans(milliseconds) {
@@ -52,6 +53,16 @@ window.utils = {
     }
     return 'Just now';
   },
+
+  /**
+   * Highlight using highlight.js
+   * @param {string} text
+   * @param {string} language
+   * @returns
+   */
+  highlight(text, language) {
+    return hljs.highlight(text, { language }).value;
+  },
 };
 
 window.invoke = async (channel, ...args) => {
@@ -83,3 +94,26 @@ window.invoke = async (channel, ...args) => {
 
   ModalStream(modalData);
 };
+
+window.api.on('err', (_, err) => {
+  const modalData = {
+    type: 'error',
+    text: err.error,
+  };
+  if (!err.code || err.code === 500) {
+    modalData.closeable = false;
+    modalData.buttons = [
+      m(Button, {
+        type: 'error',
+        class: 'mt-4',
+        text: 'Try again',
+        onclick: () => {
+          ModalStream(false);
+          window.reloadConfig();
+        },
+      }),
+    ];
+  }
+
+  ModalStream(modalData);
+});

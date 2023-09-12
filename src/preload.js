@@ -1,8 +1,8 @@
 import { contextBridge, ipcRenderer } from 'electron';
 import { BadRequest } from './errors';
 
-const whitelistListenChannels = ['k8s.watchPodLogs'];
-const whitelistSendChannels = [];
+const whitelistListenChannels = ['err', 'k8s.watchPodLogs', 'k8s.logPing'];
+const whitelistSendChannels = ['k8s.logPong'];
 const whitelistInvokeChannels = [
   'k8s.reloadConfig',
   'k8s.getClusters',
@@ -14,6 +14,7 @@ const whitelistInvokeChannels = [
   'k8s.getPods',
   'k8s.readPod',
   'k8s.watchPodLogs',
+  'k8s.stopPodLogs',
 ];
 
 contextBridge.exposeInMainWorld('app', {

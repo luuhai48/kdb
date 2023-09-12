@@ -2,7 +2,6 @@
 import m from 'mithril';
 import { twMerge } from 'tailwind-merge';
 import yaml from 'yaml';
-import hljs from 'highlight.js';
 
 import Button from '../components/button';
 
@@ -85,6 +84,14 @@ export default function () {
     oninit: async () => {
       await oninit();
       pageInit = true;
+    },
+
+    onremove: () => {
+      disabled = true;
+      listResources = [];
+      selectedResource = null;
+      search = null;
+      pageInit = false;
     },
 
     view: () => [
@@ -332,12 +339,12 @@ export default function () {
                       'w-full text-left p-2 overflow-auto text-sm border border-gray-200 rounded-lg',
                   },
                   m.trust(
-                    hljs.highlight(
+                    window.utils.highlight(
                       Object.entries(selectedResource.data)
                         .map(([key, val]) => `${key}=${atob(val)}`)
                         .join('\n'),
-                      { language: 'properties' },
-                    ).value,
+                      'properties',
+                    ),
                   ),
                 ),
               ),

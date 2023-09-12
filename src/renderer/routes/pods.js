@@ -17,6 +17,7 @@ export default function () {
   let selectedResource;
   let search;
   let pageInit = false;
+  let log = '';
 
   const oninit = async () => {
     await new Promise((resolve) => {
@@ -49,6 +50,7 @@ export default function () {
     listResources = [];
     selectedResource = null;
     search = null;
+    log = '';
 
     m.redraw();
 
@@ -57,10 +59,36 @@ export default function () {
     }
   });
 
+  let onCloseHooks = [];
+
   return {
     oninit: async () => {
       await oninit();
       pageInit = true;
+    },
+
+    onremove: async () => {
+      if (selectedResource?.metadata?.name) {
+        window.invoke(
+          'k8s.stopPodLogs',
+          `${ClusterStream().currentNamespace}:${
+            selectedResource.metadata.name
+          }`,
+        );
+      }
+
+      disabled = true;
+      listResources = [];
+      selectedResource = null;
+      search = null;
+      pageInit = false;
+      log = '';
+
+      if (!onCloseHooks.length) return;
+      for (let [channel, listener] of onCloseHooks) {
+        window.api.off(channel, listener);
+      }
+      onCloseHooks = [];
     },
 
     view: () => [
@@ -172,22 +200,61 @@ export default function () {
                               'bg-white border-b hover:bg-gray-50 cursor-pointer',
                             onclick: async () => {
                               if (disabled) return;
-
                               disabled = true;
 
+                              const namespace =
+                                ClusterStream().currentNamespace;
                               const data = await window.invoke(
                                 'k8s.readPod',
                                 r.name,
-                                ClusterStream().currentNamespace,
+                                namespace,
                               );
 
-                              disabled = false;
                               if (!data) {
+                                disabled = false;
                                 m.redraw();
                                 return;
                               }
 
                               selectedResource = data;
+
+                              const watchPodLogsListener = (
+                                _,
+                                { channel, data },
+                              ) => {
+                                if (channel !== `${namespace}:${r.name}`)
+                                  return;
+
+                                log += window.utils.highlight(
+                                  data,
+                                  'accesslog',
+                                );
+                                m.redraw();
+                              };
+                              window.api.on(
+                                'k8s.watchPodLogs',
+                                watchPodLogsListener,
+                              );
+
+                              const logPingHandler = (_, channel) => {
+                                if (channel !== `${namespace}:${r.name}`)
+                                  return;
+                                window.api.send('k8s.logPong', channel);
+                              };
+                              window.api.on('k8s.logPing', logPingHandler);
+
+                              onCloseHooks.push(
+                                ['k8s.watchPodLogs', watchPodLogsListener],
+                                ['k8s.logPing', logPingHandler],
+                              );
+
+                              await window.invoke(
+                                'k8s.watchPodLogs',
+                                r.name,
+                                namespace,
+                              );
+
+                              disabled = false;
                               m.redraw();
                             },
                           },
@@ -292,7 +359,23 @@ export default function () {
                       type: 'noBorder',
                       pill: true,
                       onclick: () => {
+                        if (selectedResource?.metadata?.name) {
+                          window.invoke(
+                            'k8s.stopPodLogs',
+                            `${ClusterStream().currentNamespace}:${
+                              selectedResource.metadata.name
+                            }`,
+                          );
+                        }
+
                         selectedResource = null;
+                        log = '';
+
+                        if (!onCloseHooks.length) return;
+                        for (let [channel, listener] of onCloseHooks) {
+                          window.api.off(channel, listener);
+                        }
+                        onCloseHooks = [];
                       },
                     },
                     m(BackIcon),
@@ -316,9 +399,9 @@ export default function () {
                   'pre',
                   {
                     class:
-                      'w-full text-left p-2 overflow-auto text-sm border border-gray-200 rounded-lg',
+                      'w-full text-left p-2 whitespace-pre-wrap break-all text-sm border border-gray-200 rounded-lg max-h-[80vh] overflow-auto',
                   },
-                  'Pod logs here',
+                  m.trust(log),
                 ),
               ),
           ),

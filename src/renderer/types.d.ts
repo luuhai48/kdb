@@ -1,4 +1,5 @@
 import { IpcRendererEvent } from 'electron';
+import { Vnode } from 'mithril';
 
 declare global {
   interface Window {
@@ -48,5 +49,17 @@ declare global {
      * show modal automaticly
      */
     invoke: (channel: string, ...args: any[]) => Promise<any | undefined>;
+
+    utils: {
+      /**
+       * Translates time into human readable format of seconds, minutes, hours, days, and years
+       */
+      forHumans: (milliseconds: number | string | Date) => string;
+
+      /**
+       * Highlight using `highlight.js`
+       */
+      highlight: (text: string, language: string) => Vnode<any, any>;
+    };
   }
 }

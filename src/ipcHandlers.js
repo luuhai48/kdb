@@ -160,25 +160,76 @@ export default (args) => {
     }
   });
 
+  const logRequests = {};
+
   ipcMain.handle('k8s.watchPodLogs', async (_, podName, namespace) => {
     if (!k8s.config || !k8s.api || !k8s.appsApi || !k8s.log) {
       return InternalServerError('Invalid kube config');
     }
 
+    const logChannel = `${namespace}:${podName}`;
+    if (logRequests[logChannel]) return true;
+
     try {
       const logStream = new stream.PassThrough();
       logStream.on('data', (chunk) => {
-        args.window.webContents.send('k8s.watchPodLogs', chunk);
+        args.window.webContents.send('k8s.watchPodLogs', {
+          channel: logChannel,
+          data: chunk.toString(),
+        });
       });
 
       const req = await k8s.log.log(namespace, podName, undefined, logStream, {
         follow: true,
-        tailLines: 50,
+        tailLines: 100,
         pretty: true,
-        timestamps: true,
       });
+
+      logRequests[logChannel] = {
+        req,
+        stream: logStream,
+        interval: setInterval(() => {
+          if (!logRequests[logChannel]) return;
+
+          args.window.webContents.send('k8s.logPing', logChannel);
+
+          logRequests[logChannel].timeout = setTimeout(() => {
+            if (!logRequests[logChannel]) return;
+            const log = logRequests[logChannel];
+
+            log.req.abort();
+            log.stream.destroy();
+            clearInterval(log.interval);
+            delete logRequests[logChannel];
+          }, 5000);
+        }, 5000),
+      };
+
+      return true;
     } catch (err) {
       return BadRequest(err.message);
     }
+  });
+
+  ipcMain.handle('k8s.stopPodLogs', async (_, logChannel) => {
+    if (!logRequests[logChannel]) return false;
+
+    try {
+      const log = logRequests[logChannel];
+      log.req.abort();
+      log.stream.destroy();
+      clearInterval(log.interval);
+      clearTimeout(log.timeout);
+      delete logRequests[logChannel];
+
+      return true;
+    } catch (err) {
+      return BadRequest(err.message);
+    }
+  });
+
+  ipcMain.on('k8s.logPong', (_, logChannel) => {
+    if (!logRequests[logChannel]) return;
+    clearTimeout(logRequests[logChannel].timeout);
   });
 };

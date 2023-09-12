@@ -1,6 +1,5 @@
 import m from 'mithril';
 import { twMerge } from 'tailwind-merge';
-import hljs from 'highlight.js';
 
 import ModalStream from '../streams/modal';
 
@@ -79,9 +78,10 @@ export default function () {
                       class: 'text-left p-2 overflow-auto text-sm',
                     },
                     m.trust(
-                      hljs.highlight(v.attrs.code, {
-                        language: v.attrs.codeLanguage,
-                      }).value,
+                      window.utils.highlight(
+                        v.attrs.code,
+                        v.attrs.codeLanguage,
+                      ),
                     ),
                   ),
                 ),
