@@ -6,10 +6,10 @@ import Button from '../components/button';
 
 import ClusterStream from '../streams/cluster';
 import NamespaceStream from '../streams/namespace';
+import ModalStream from '../streams/modal';
 
 import SearchIcon from '../icons/search';
 import ReloadIcon from '../icons/reload';
-import BackIcon from '../icons/back';
 
 export default function () {
   let disabled = true;
@@ -85,8 +85,8 @@ export default function () {
       log = '';
 
       if (!onCloseHooks.length) return;
-      for (let [channel, listener] of onCloseHooks) {
-        window.api.off(channel, listener);
+      for (let channel of onCloseHooks) {
+        window.api.off(channel);
       }
       onCloseHooks = [];
     },
@@ -95,10 +95,7 @@ export default function () {
       m(
         'div',
         {
-          class: twMerge(
-            'px-6 w-full flex-[0_0_auto] transition-all',
-            ...(selectedResource ? ['-translate-x-full'] : ['translate-x-0']),
-          ),
+          class: twMerge('px-6 w-full flex-[0_0_auto]'),
         },
         [
           m('div', { class: 'relative w-max flex' }, [
@@ -225,11 +222,10 @@ export default function () {
                                 if (channel !== `${namespace}:${r.name}`)
                                   return;
 
-                                log += window.utils.highlight(
-                                  data,
-                                  'accesslog',
-                                );
-                                m.redraw();
+                                log += '\n' + data;
+                                log = log.split('\n').slice(-100).join('\n');
+
+                                ModalStream({ ...ModalStream(), code: log });
                               };
                               window.api.on(
                                 'k8s.watchPodLogs',
@@ -244,8 +240,8 @@ export default function () {
                               window.api.on('k8s.logPing', logPingHandler);
 
                               onCloseHooks.push(
-                                ['k8s.watchPodLogs', watchPodLogsListener],
-                                ['k8s.logPing', logPingHandler],
+                                'k8s.watchPodLogs',
+                                'k8s.logPing',
                               );
 
                               await window.invoke(
@@ -256,6 +252,31 @@ export default function () {
 
                               disabled = false;
                               m.redraw();
+
+                              ModalStream({
+                                fullWidth: true,
+                                code: log,
+                                codeLanguage: 'accessLog',
+                                onremove: () => {
+                                  if (selectedResource?.metadata?.name) {
+                                    window.invoke(
+                                      'k8s.stopPodLogs',
+                                      `${ClusterStream().currentNamespace}:${
+                                        selectedResource.metadata.name
+                                      }`,
+                                    );
+                                  }
+
+                                  selectedResource = null;
+                                  log = '';
+
+                                  if (!onCloseHooks.length) return;
+                                  for (let channel of onCloseHooks) {
+                                    window.api.off(channel);
+                                  }
+                                  onCloseHooks = [];
+                                },
+                              });
                             },
                           },
                           [
@@ -327,84 +348,6 @@ export default function () {
                   ],
                 ),
               ),
-        ],
-      ),
-
-      m(
-        'div',
-        {
-          class: twMerge(
-            'w-full flex-[0_0_auto] transition-all',
-            ...(selectedResource ? ['-translate-x-full'] : ['translate-x-0']),
-          ),
-        },
-        [
-          m(
-            'div',
-            {
-              class: 'whitespace-pre leading-6 ml-6 relative mt-10',
-            },
-
-            selectedResource &&
-              m(
-                'div',
-                {
-                  class: 'absolute -top-10 left-0 flex w-full items-center',
-                },
-                [
-                  m(
-                    Button,
-                    {
-                      title: 'Go back',
-                      type: 'noBorder',
-                      pill: true,
-                      onclick: () => {
-                        if (selectedResource?.metadata?.name) {
-                          window.invoke(
-                            'k8s.stopPodLogs',
-                            `${ClusterStream().currentNamespace}:${
-                              selectedResource.metadata.name
-                            }`,
-                          );
-                        }
-
-                        selectedResource = null;
-                        log = '';
-
-                        if (!onCloseHooks.length) return;
-                        for (let [channel, listener] of onCloseHooks) {
-                          window.api.off(channel, listener);
-                        }
-                        onCloseHooks = [];
-                      },
-                    },
-                    m(BackIcon),
-                  ),
-
-                  m(
-                    'h1',
-                    { class: 'ml-4' },
-                    `Pod: ${selectedResource.metadata.name}`,
-                  ),
-                ],
-              ),
-
-            selectedResource &&
-              m(
-                'div',
-                {
-                  class: 'relative',
-                },
-                m(
-                  'pre',
-                  {
-                    class:
-                      'w-full text-left p-2 whitespace-pre-wrap break-all text-sm border border-gray-200 rounded-lg max-h-[80vh] overflow-auto',
-                  },
-                  m.trust(log),
-                ),
-              ),
-          ),
         ],
       ),
     ],

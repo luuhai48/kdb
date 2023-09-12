@@ -9,6 +9,12 @@ import CloseIcon from '../icons/close';
 
 export default function () {
   return {
+    onupdate: () => {
+      const codeElement = document.querySelector('#modal-code');
+      if (codeElement) {
+        codeElement.scrollTop = codeElement.scrollHeight;
+      }
+    },
     /**
      * @param {import('mithril').Vnode} v
      */
@@ -21,7 +27,9 @@ export default function () {
             'fixed top-0 left-0 right-0 z-50 p-4 overflow-x-hidden overflow-y-auto md:inset-0 max-h-full bg-gray-600 bg-opacity-90 flex justify-center items-center',
           onclick: (e) => {
             if (v.attrs?.closeable === false) return;
-            if (e.target.classList.contains('modal')) ModalStream(false);
+            if (e.target.classList.contains('modal')) {
+              ModalStream(false);
+            }
           },
         },
         m(
@@ -75,7 +83,8 @@ export default function () {
                   m(
                     'pre',
                     {
-                      class: 'text-left p-2 overflow-auto text-sm',
+                      id: 'modal-code',
+                      class: 'text-left p-2 overflow-auto text-sm max-h-[88vh]',
                     },
                     m.trust(
                       window.utils.highlight(

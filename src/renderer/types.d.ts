@@ -23,12 +23,9 @@ declare global {
       ) => void;
 
       /**
-       * Remove event listener
+       * Remove event listeners
        */
-      off: (
-        channel: string,
-        listener: (event: IpcRendererEvent, ...args: any[]) => void,
-      ) => void;
+      off: (channel: string) => void;
 
       /**
        * Send an event to backend

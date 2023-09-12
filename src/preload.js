@@ -35,12 +35,11 @@ contextBridge.exposeInMainWorld('api', {
   },
 
   /**
-   * Listen to events from backend
+   * Remove event listeners
    * @param {string} channel
-   * @param {(event: import('electron').IpcRendererEvent, ...args: any[]) => void} listener
    */
-  off: (channel, listener) => {
-    ipcRenderer.off(channel, listener);
+  off: (channel) => {
+    ipcRenderer.removeAllListeners(channel);
   },
 
   /**
