@@ -17,6 +17,10 @@
     "k8s",
     "development"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/luuhai48/kdb.git"
+  },
   "author": {
     "name": "luuhai48",
     "email": "luuhai.hn48@gmail.com"
