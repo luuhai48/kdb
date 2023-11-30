@@ -45,4 +45,16 @@ module.exports = {
       },
     },
   ],
+  publishers: [
+    {
+      name: '@electron-forge/publisher-github',
+      config: {
+        repository: {
+          owner: 'luuhai48',
+          name: 'kdb',
+        },
+        prerelease: true,
+      },
+    },
+  ],
 };

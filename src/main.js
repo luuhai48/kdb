@@ -1,3 +1,6 @@
+const { updateElectronApp } = require('update-electron-app');
+updateElectronApp();
+
 import { app, BrowserWindow } from 'electron';
 import path from 'path';
 
